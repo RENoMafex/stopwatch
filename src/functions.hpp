@@ -3,7 +3,7 @@
 
 #include "structs.hpp"
 #include <chrono>
-#include <shortint.hpp>
+#include "shortint.hpp"
 #include <thread>
 #include <iostream>
 #include <atomic>

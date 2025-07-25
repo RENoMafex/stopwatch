@@ -4,12 +4,11 @@
 #include <csignal>
 #include <atomic>
 
-#include <shortint.hpp>
+#include "shortint.hpp"
 #include "structs.hpp"
 #include "functions.hpp"
 
-int main(int argc, char* argv[]){
-
+int main(int argc, char** argv){
 	std::signal(SIGINT, [](int){stop_flag = true;});
 
 	using namespace localOverloads;

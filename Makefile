@@ -1,6 +1,6 @@
 # Compiler and Flags
 CXX ?= g++
-CXXFLAGS = $(WARNINGS) -std=c++17 -O0 -I../../headers_includes/shortint
+CXXFLAGS = $(WARNINGS) -std=c++17 -O0
 WARNINGS = -Wall -Wextra -Wpedantic -Wshadow -Wconversion -Wsign-conversion -Wnull-dereference -Wdouble-promotion -Wformat=2
 LDFLAGS =
 
@@ -38,8 +38,7 @@ $(BUILD_DIR):
 
 # Install target
 install: $(TARGET)
-	@sudo mv $(TARGET) $(INSTALLDIR)
-
+	@cp -fv $(TARGET) $(INSTALLDIR) || sudo mv -iv $(TARGET) $(INSTALLDIR)
 
 # Clean Object files
 clean:
