@@ -4,7 +4,6 @@
 #include <csignal>
 #include <atomic>
 
-#include "shortint.hpp"
 #include "structs.hpp"
 #include "functions.hpp"
 
