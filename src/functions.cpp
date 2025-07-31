@@ -41,7 +41,7 @@ namespace localFunctions{
 		while(true){
 			now = make_disp(start);
 			if(stop_flag == true) break;
-			std::cout << reset_line << now << std::flush;
+			std::cout << ANSI::reset_line << now << std::flush;
 			delay(500);
 		}
 		return now;

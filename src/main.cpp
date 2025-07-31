@@ -21,20 +21,20 @@ int main(int argc, char** argv){
 		case 1:
 			std::cout << "0:00:00.000\n" <<
 			/*         */"Return = Set checkpoint\n" <<
-			/*         */"CTRL+C = Stop countdown" << std::flush;
+			/*         */"CTRL+C = Stop stopwatch" << std::flush;
 
 			//go back to the first line and start the stopwatch displaying cycle.
-			std::cout << up_line << up_line << std::flush;
+			std::cout << ANSI::up_line << ANSI::up_line << std::flush;
 			stopwatch(start);
 
-			std::cout << "\n\n" << bold << "Stopped countdown at:\n" << stopwatch(start) << reset << std::endl;
+			std::cout << "\n\n" << ANSI::bold << "Stopped countdown at:\n" << stopwatch(start) << ANSI::reset << std::endl;
 
 			return 0;
 
 		default:
-			std::cout << bold << "Usage:" << reset <<" \"" <<
-			/*         */*argv << "\"\n" << bold <<
-			/*         */"Note: " << reset << "Only works with terminals, that use ANSI-Sequences" << std::endl;
+			std::cout << ANSI::bold << "Usage:" << ANSI::reset <<" \"" <<
+			/*         */*argv << "\"\n" << ANSI::bold << "Note: " << ANSI::reset <<
+			/*         */"Only works with terminals, that support ANSI-Sequences\n" << std::endl;
 
 			return 1;
 	}

@@ -20,6 +20,7 @@ namespace localOverloads{
 	std::ostream& operator<<(std::ostream& os, const TimerDisplay& timer_display);
 }
 
+namespace ANSI{
 // ANSI Escape sequence to clear current line.
 constexpr std::string_view reset_line = "\033[2K\033[0G";
 
@@ -31,6 +32,6 @@ constexpr std::string_view reset = "\033[0m";
 
 // ANSI Escape sequence for **BOLD** text
 constexpr std::string_view bold = "\033[1m";
-
+} // namespace ANSI
 #endif
 
