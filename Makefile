@@ -60,8 +60,6 @@ cleanall: clean
 	@echo "\n$(BOLD)$(CYAN)Removing executable:$(RESET)"
 	@rm -rfv $(TARGET)
 
-target: all
-
 # help target
 help:
 	@echo
@@ -89,3 +87,5 @@ override BLUE = \033[34m
 override MAGENTA = \033[35m
 override CYAN = \033[36m
 override WHITE = \033[37m
+
+target: all
