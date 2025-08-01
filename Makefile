@@ -33,6 +33,8 @@ $(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp $(HDRS) | $(BUILD_DIR)
 	@echo "$(YELLOW)$(UNDERLINE)Now Compiling:$(RESET) $(BOLD)$< $(RESET)into $(BOLD)$@$(RESET)"
 	@$(CXX) $(CXXFLAGS) -c $< -o $@
 	@echo "$(GREEN)$(UNDERLINE)Done compiling$(RESET) $(BOLD)$(notdir $@)$(RESET)"
+	@$(eval DONEOBJS = $(shell expr $(DONEOBJS) + "1"))
+	@printf "$(BOLD)$(CYAN)Progress: $(BOLD)$(CYAN)%.0f%%$(RESET)\n" $(shell echo "scale=2; ($(DONEOBJS) * 100) / $(NUMOBJS)" | bc)
 
 # Link
 $(TARGET): $(OBJS)
@@ -88,5 +90,8 @@ override BLUE = \033[34m
 override MAGENTA = \033[35m
 override CYAN = \033[36m
 override WHITE = \033[37m
+
+override NUMOBJS = $(words $(OBJS))
+DONEOBJS := 0
 
 target: all
