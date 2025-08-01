@@ -19,7 +19,7 @@ LDFLAGS =
 SRC_DIR = src
 HDR_DIR = src
 BUILD_DIR = build
-INSTALLDIR = ~/bin/
+INSTALLDIR = ~/bin
 
 # Source, Header and Object files
 SRCS = $(wildcard $(SRC_DIR)/*.cpp) $(wildcard $(SRC_DIR)/*.c)
@@ -43,8 +43,10 @@ $(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp $(HDRS) | $(BUILD_DIR)
 		echo "\n$(BOLD)$(CYAN)Compiling:$(RESET) $(BOLD)$(NEEDEDOBJS) Files"; \
 		if [ "$(NEEDEDOBJS)" = "0" ]; then \
 			echo "$(BOLD)$(YELLOW)WARNING:$(RESET)"; \
-			echo "$(YELLOW)Looks like you supplied '-B' or '--always-make' to 'make'. Some Variables may be wrong.$(RESET)"; \
-			echo "$(YELLOW)You may also encounter some errors, which are $(BOLD)NOT$(RESET)$(YELLOW) breaking the build process.$(RESET)\n"; \
+			echo "$(YELLOW)Looks like you supplied '-B' or '--always-make' to \
+	'make'. Some Variables may be wrong.$(RESET)"; \
+			echo "$(YELLOW)You may also encounter some errors, which are \
+	$(BOLD)NOT$(RESET)$(YELLOW) breaking the build process.$(RESET)\n"; \
 			echo "$(GREEN)$(BOLD)SOLUTION:$(RESET)"; \
 			echo "If you want to rebuild everything simply run 'make clean' before rebuilding!$(RESET)\n"; \
 			sleep 1; \
@@ -60,7 +62,7 @@ $(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp $(HDRS) | $(BUILD_DIR)
 $(TARGET): $(OBJS)
 	@echo "\n$(BOLD)$(CYAN)Linking: $(BOLD)$(TARGET)$(RESET)"
 	$(CXX) $^ -o $@ $(LDFLAGS)
-	@echo "$(BOLD)$(GREEN)DONE BUILDING EXECUTABLE$(RESET)"
+	@echo "$(BOLD)$(GREEN)DONE BUILDING EXECUTABLE!$(RESET)"
 
 # Make the build directory if needed
 $(BUILD_DIR):
@@ -72,6 +74,13 @@ $(BUILD_DIR):
 install: $(TARGET)
 	@echo "\n$(BOLD)$(CYAN)Installing $(TARGET) at $(INSTALLDIR):$(RESET)"
 	@cp -fv $(TARGET) $(INSTALLDIR) || sudo mv -iv $(TARGET) $(INSTALLDIR)
+
+# Uninstall target
+.PHONY: uninstall
+uninstall: $(INSTALLDIR)/$(TARGET)
+	@echo "$(BOLD)$(CYAN)Uninstalling $(INSTALLDIR)/$(TARGET)$(RESET)"
+	@rm -rfv $(INSTALLDIR)/$(TARGET) || sudo rm -rfv $(INSTALLDIR)/$(TARGET)
+	@echo "$(BOLD)$(GREEN)DONE UNINSTALLING!$(RESET)"
 
 # Clean Object files
 .PHONY: clean
@@ -99,6 +108,7 @@ help:
 	@echo
 	@echo "also the following are valid targets:"
 	@echo "$(BOLD)$(TARGET) $(OBJS)$(RESET)"
+	@echo
 
 # Some ASCII Escapes as constants
 override RESET = \033[0m
