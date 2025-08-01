@@ -27,7 +27,7 @@ int main(int argc, char** argv){
 			std::cout << ANSI::up_line << ANSI::up_line << std::flush;
 			stopwatch(start);
 
-			std::cout << "\n\n" << ANSI::bold << "Stopped countdown at:\n" << stopwatch(start) << ANSI::reset << std::endl;
+			std::cout << "\n\n" << ANSI::bold << "Stopped stopwatch at:\n" << stopwatch(start) << ANSI::reset << std::endl;
 
 			return 0;
 
