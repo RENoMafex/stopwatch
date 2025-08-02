@@ -39,28 +39,33 @@ all: $(TARGET)
 
 # Compile
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp $(HDRS) | $(BUILD_DIR)
-	@if [ "$@" = "$(firstword $(OBJS))" ]; then \
-		echo "\n$(BOLD)$(CYAN)Compiling:$(RESET) $(BOLD)$(NEEDEDOBJS) Files"; \
-		if [ "$(NEEDEDOBJS)" = "0" ]; then \
-			echo "$(BOLD)$(YELLOW)WARNING:$(RESET)"; \
+	@if [ "$@" = "$(firstword $(OBJS))" ]; then																	\
+		printf "\n$(BOLD)$(CYAN)Compiling:$(RESET) $(BOLD)$(NEEDEDOBJS) Files: ";								\
+		if [ "$(NEEDEDOBJS)" -ne 0 ]; then																		\
+			echo "[ $(foreach var,$(notdir $(REBUILD_OBJS)),$(UNDERLINE)$(BOLD)$(var)$(RESET)) ]";				\
+		else																									\
+			echo;																								\
+		fi;																										\
+		if [ "$(NEEDEDOBJS)" = "0" ]; then																		\
+			echo "$(BOLD)$(YELLOW)WARNING:$(RESET)";															\
 			echo "$(YELLOW)Looks like you supplied '-B' or '--always-make' to \
-	'make'. Some Variables may be wrong.$(RESET)"; \
+	'make'. Some Variables may be wrong.$(RESET)";																\
 			echo "$(YELLOW)You may also encounter some errors, which are \
-	$(BOLD)NOT$(RESET)$(YELLOW) breaking the build process.$(RESET)\n"; \
-			echo "$(GREEN)$(BOLD)SOLUTION:$(RESET)"; \
-			echo "If you want to rebuild everything simply run 'make clean' before rebuilding!$(RESET)\n"; \
-			sleep 1; \
-		fi \
+	$(BOLD)NOT$(RESET)$(YELLOW) breaking the build process.$(RESET)\n";											\
+			echo "$(GREEN)$(BOLD)SOLUTION:$(RESET)";															\
+			echo "If you want to rebuild everything simply run 'make clean' before rebuilding!$(RESET)\n";		\
+		fi;																										\
+		sleep 1;																								\
 	fi
-	@echo "$(YELLOW)$(UNDERLINE)Now Compiling:$(RESET) $(BOLD)$< $(RESET)into $(BOLD)$@$(RESET)"
+	@echo "$(BMAGENTA)$(UNDERLINE)Now Compiling:$(RESET) $(BOLD)$< $(RESET)into $(BOLD)$(dir $@)$(UNDERLINE)$(notdir $@)$(RESET)"
 	@$(CXX) $(CXXFLAGS) -c $< -o $@
-	@echo "$(GREEN)$(UNDERLINE)Done compiling$(RESET) $(BOLD)$(notdir $@)$(RESET)"
+	@echo "$(GREEN)$(UNDERLINE)Done compiling$(RESET) $(BOLD)$(UNDERLINE)$(notdir $@)$(RESET)"
 	@$(eval DONEOBJS = $(shell expr $(DONEOBJS) + "1"))
 	@printf "$(BOLD)$(CYAN)Progress: $(BOLD)$(GREEN)%.0f%%$(RESET)\n" $(shell echo "scale=2; ($(DONEOBJS) * 100) / $(NEEDEDOBJS)" | bc)
 
 # Link
 $(TARGET): $(OBJS)
-	@echo "\n$(BOLD)$(CYAN)Linking: $(BOLD)$(TARGET)$(RESET)"
+	@echo "\n$(BOLD)$(CYAN)Linking: $(BOLD)$(UNDERLINE)$(TARGET)$(RESET)"
 	$(CXX) $^ -o $@ $(LDFLAGS)
 	@echo "$(BOLD)$(GREEN)DONE BUILDING EXECUTABLE!$(RESET)"
 
@@ -124,6 +129,8 @@ override BLUE = \033[34m
 override MAGENTA = \033[35m
 override CYAN = \033[36m
 override WHITE = \033[37m
+override BBLUE = \033[94m
+override BMAGENTA = \033[95m
 
 DONEOBJS := 0
 override TSOBJS     = $(foreach obj, $(OBJS), $(shell stat -c %Y $(obj) 2>/dev/null || echo 0))
