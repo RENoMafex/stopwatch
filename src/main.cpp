@@ -4,9 +4,16 @@
 #include <csignal>
 #include <atomic>
 
-#include "my_atomics.hpp"
+// #include "stopwatch_utils.hpp"
+#include "shortint.hpp"
 
-int main(int argc, char** argv){
+#define unused [[maybe_unused]]
+
+std::atomic<bool>stop_flag = false;
+
+
+int main(unused int argc, unused char** argv){
 	std::signal(SIGINT, [](int){stop_flag = true;});
 
+	std::cout << "00:00:00.000";
 }
