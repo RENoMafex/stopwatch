@@ -1,5 +1,7 @@
 #!/usr/bin/make -f
 
+MAKEFLAGS += --no-print-directory
+
 # This Makefile has been proudly crafted by Malte Schilling in 2025.
 # It is released into the Public Domain, you are free to use it in any
 # project under any license!
@@ -18,12 +20,12 @@ RELEASE ?= false
 COMPILER ?= g++
 COMPILER_FLAGS =
 STANDARD = c++17
-LINKER_FLAGS =
-WARNINGS = -Wall -Wextra -Wpedantic -Wshadow -Wconversion -Wsign-conversion -Wnull-dereference -Wdouble-promotion -Wformat=2
+LINKER_FLAGS = -lncurses
+WARNINGS = -Wall -Wextra -Wpedantic -Wshadow -Wconversion -Wsign-conversion -Wnull-dereference -Wdouble-promotion -Wformat=2 -Winvalid-pch -Wduplicated-cond -Wduplicated-branches -Wlogical-op -Wcast-qual -Wcast-align -Wstrict-aliasing=2
 
 # Directories
 SRC_DIR ?= src
-HDR_DIR ?= src
+HDR_DIR ?= include
 BUILD_DIR ?= build
 INSTALL_DIR ?= ~/bin
 
@@ -41,10 +43,10 @@ TARGET = stopwatch
 # END OF SETUP #
 ################
 
-.NOTPARALLEL: install
+# .NOTPARALLEL: install
 
 # Some ASCII Escapes as constants
-override RESET = \033[0m
+override R = \033[0m
 override BOLD = \033[1m
 override ITALIC = \033[36m
 override UNDERLINE = \033[4m
@@ -66,17 +68,46 @@ override BBLUE = \033[94m
 override BMAGENTA = \033[95m
 override BCYAN = \033[96m
 override BWHITE = \033[97m
+override ONBLACK = \033[40m
+override ONRED = \033[41m
+override ONGREEN = \033[42m
+override ONYELLOW = \033[43m
+override ONBLUE = \033[44m
+override ONMAGENTA = \033[45m
+override ONCYAN = \033[46m
+override ONWHITE = \033[47m
+override ONBBLACK = \033[100m
+override ONBRED = \033[101m
+override ONBGREEN = \033[102m
+override ONBYELLOW = \033[103m
+override ONBBLUE = \033[104m
+override ONBMAGENTA = \033[105m
+override ONBCYAN = \033[106m
+override ONBWHITE = \033[107m
 
-ifeq ($(RELEASE),true)
-# Release Flags
-override CONST_COMPILER_FLAGS = $(COMPILER_FLAGS) $(WARNINGS) -std=$(STANDARD) -O3 -flto -DNDEBUG -I$(HDR_DIR)
-override CONST_LINKER_FLAGS = $(LINKER_FLAGS) -flto
-$(shell echo 1>&2 "$(BOLD)$(GREEN)=== USING RELEASE CONFIGURATION ===$(RESET)")
-else
-# Debug Flags
-override CONST_COMPILER_FLAGS = $(COMPILER_FLAGS) $(WARNINGS) -std=$(STANDARD) -O0 -g -I$(HDR_DIR)
-override CONST_LINKER_FLAGS = $(LINKER_FLAGS) -g
-$(shell echo 1>&2 "$(BOLD)$(YELLOW)=== USING DEBUG CONFIGURATION ===$(RESET)")
+ifeq ($(RELEASE),true) # Release Flags
+override CONST_COMPILER_FLAGS = $(COMPILER_FLAGS) $(WARNINGS) -std=$(STANDARD) -flto -O3 -DNDEBUG -I$(HDR_DIR)
+override CONST_LINKER_FLAGS = $(LINKER_FLAGS) -flto -O3
+$(shell echo 1>&2 "$(BOLD)$(GREEN)=== USING RELEASE CONFIGURATION ===$(R)")
+$(shell echo 1>&2        "$(GREEN) This Build will utilize the best$(R)")
+$(shell echo 1>&2        "$(GREEN)possible optimizations towards file$(R)")
+$(shell echo 1>&2        "$(GREEN)      size and performance!$(R)")
+$(shell echo 1>&2        "$(GREEN)$(R)")
+else # Debug Flags
+override CONST_COMPILER_FLAGS = $(COMPILER_FLAGS) $(WARNINGS) -std=$(STANDARD) -g -O0 -I$(HDR_DIR)
+override CONST_LINKER_FLAGS = $(LINKER_FLAGS) -g -O0
+$(shell echo 1>&2 "$(BOLD)$(YELLOW)=== USING DEBUG CONFIGURATION ===$(R)")
+$(shell echo 1>&2        "$(YELLOW) This Build will not utilize any $(R)")
+$(shell echo 1>&2        "$(YELLOW) optimizations at all, this mode $(R)")
+$(shell echo 1>&2        "$(YELLOW) focuses on fast build times and $(R)")
+$(shell echo 1>&2        "$(YELLOW)           debugability! $(R)")
+$(shell echo 1>&2        "$(YELLOW)  $(R)")
+endif
+
+ifneq (,$(findstring B,$(MAKEFLAGS)))
+override NEEDEDOBJS = $(words $(OBJS))
+override REBUILD_OBJS = $(OBJS)
+$(shell echo 1>&2 "$(BOLD)$(GREEN)=== ALWAYS MAKE MODE DETECTED ===$(R)")
 endif
 
 # Build executable, assembly files and preprocessed files
@@ -90,134 +121,136 @@ target: $(TARGET)
 
 # Compile
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp $(HDRS) | $(BUILD_DIR)
-	@if [ "$@" = "$(firstword $(OBJS))" ]; then																	\
-		printf "\n$(BOLD)$(CYAN)Compiling:$(RESET) $(BOLD)$(NEEDEDOBJS) Files: ";								\
-		if [ "$(NEEDEDOBJS)" -ne 0 ]; then																		\
-			echo "[ $(foreach var,$(notdir $(REBUILD_OBJS)),$(UNDERLINE)$(BOLD)$(var)$(RESET)) ] with $(CONST_COMPILER_FLAGS)";\
-		else																									\
-			echo;																								\
-		fi;																										\
-		if [ "$(NEEDEDOBJS)" = "0" ]; then																		\
-			echo "$(BOLD)$(YELLOW)WARNING:$(RESET)";															\
-			echo "$(YELLOW)Looks like you supplied "-B" or "--always-make" to \
-	"make". Some Variables may be wrong.$(RESET)";																\
-			echo "$(YELLOW)You may also encounter some errors, which are \
-	$(BOLD)NOT$(RESET)$(YELLOW) breaking the build process.$(RESET)\n";											\
-			echo "$(GREEN)$(BOLD)SOLUTION:$(RESET)";															\
-			echo "If you want to rebuild everything simply run "make clean" before rebuilding!$(RESET)\n";		\
-		fi;																										\
-		sleep 0.1;																								\
+	@if [ "$(findstring j,$(MAKEFLAGS))" = "j" ]; then															\
+	echo "\n$(YELLOW)$(BOLD)=== PARALLEL COMPILING DETECTED ===";												\
+	echo "$(YELLOW)This means, the progress shown might";														\
+	echo "         $(YELLOW)be not accurate!";																	\
 	fi
-	@echo "$(BMAGENTA)$(UNDERLINE)Now Compiling:$(RESET) $(BOLD)$< $(RESET)into $(BOLD)$(dir $@)$(UNDERLINE)$(notdir $@)$(RESET)"
+	@if [ "$@" = "$(firstword $(REBUILD_OBJS))" ]; then															\
+		printf "\n$(BOLD)$(CYAN)Compiling:$(R) $(BOLD)$(BWHITE)$(NEEDEDOBJS) Files: ";							\
+		echo "\n  $(BOLD)[$(foreach var,$(notdir $(REBUILD_OBJS)), 												\
+	$(UNDERLINE)$(BOLD)$(BWHITE)$(var)$(R))$(BOLD) ]\nwith $(BOLD)$(BWHITE)$(words $(CONST_COMPILER_FLAGS)) \
+	Flags:";																									\
+	echo "$(CONST_COMPILER_FLAGS)\n";																			\
+	else																										\
+		echo;																									\
+	fi;
+	@sleep 0.1
+	@echo "$(BMAGENTA)$(UNDERLINE)Now Compiling:$(R) $(BOLD)$< $(R)into $(BOLD)$(dir $@)$(UNDERLINE)$(notdir $@)$(R)"
 	@$(COMPILER) -c $< -o $@ $(CONST_COMPILER_FLAGS)
-	@echo "$(GREEN)$(UNDERLINE)Done compiling$(RESET) $(BOLD)$(UNDERLINE)$(notdir $@)$(RESET)"
+	@echo "$(GREEN)$(UNDERLINE)Done compiling$(R) $(BOLD)$(UNDERLINE)$(notdir $@)$(R)"
 	@$(eval DONEOBJS = $(shell expr $(DONEOBJS) + "1"))
-	@printf "$(BOLD)$(CYAN)Progress: $(BOLD)$(GREEN)%.0f%%$(RESET)\n" $(shell echo "scale=2; ($(DONEOBJS) * 100) / $(NEEDEDOBJS)" | bc)
+	@printf "$(BOLD)$(CYAN)Progress: $(BOLD)$(GREEN)%.0f%%$(R)\n" $(shell echo "scale=2; ($(DONEOBJS) * 100) / $(NEEDEDOBJS)" | bc)
 
 # Assemble
 .PHONY: assemble
 assemble: $(ASMS)
 $(BUILD_DIR)/asm/%.s: $(SRC_DIR)/%.cpp $(HDRS) | $(BUILD_DIR)/asm
 	@if [ "$@" = "$(firstword $(ASMS))" ]; then																	\
-		printf "\n$(BOLD)$(CYAN)Assembling:$(RESET)";															\
+		printf "\n$(BOLD)$(CYAN)Assembling:$(R)\n";															\
 	fi
-	@echo "$(BMAGENTA)$(UNDERLINE)Now Assembling:$(RESET) $(BOLD)$< $(RESET)into $(BOLD)$(dir $@)$(UNDERLINE)$(notdir $@)$(RESET)"
+	@echo "$(BMAGENTA)$(UNDERLINE)Now Assembling:$(R) $(BOLD)$< $(R)into $(BOLD)$(dir $@)$(UNDERLINE)$(notdir $@)$(R)"
 	@$(COMPILER) -S $< -o $@ $(CONST_COMPILER_FLAGS)
-	@echo "$(GREEN)$(UNDERLINE)Done assembling$(RESET) $(BOLD)$(UNDERLINE)$(notdir $@)$(RESET)"
+	@echo "$(GREEN)$(UNDERLINE)Done assembling$(R) $(BOLD)$(UNDERLINE)$(notdir $@)$(R)"
 
 # Preprocess
 .PHONY: preprocess
 preprocess: $(DOTI)
 $(BUILD_DIR)/preprocessed/%.i: $(SRC_DIR)/%.cpp $(HDRS) | $(BUILD_DIR)/preprocessed
 	@if [ "$@" = "$(firstword $(DOTI))" ]; then																	\
-		printf "\n$(BOLD)$(CYAN)Preprocessing:$(RESET)\n";														\
+		printf "\n$(BOLD)$(CYAN)Preprocessing:$(R)\n";														\
 	fi
-	@echo "$(BMAGENTA)$(UNDERLINE)Now Preprocessing:$(RESET) $(BOLD)$< $(RESET)into $(BOLD)$(dir $@)$(UNDERLINE)$(notdir $@)$(RESET)"
+	@echo "$(BMAGENTA)$(UNDERLINE)Now Preprocessing:$(R) $(BOLD)$< $(R)into $(BOLD)$(dir $@)$(UNDERLINE)$(notdir $@)$(R)"
 	@$(COMPILER) -E $< -o $@ $(CONST_COMPILER_FLAGS)
-	@echo "$(GREEN)$(UNDERLINE)Done preprocessing$(RESET) $(BOLD)$(UNDERLINE)$(notdir $@)$(RESET)"
+	@echo "$(GREEN)$(UNDERLINE)Done preprocessing$(R) $(BOLD)$(UNDERLINE)$(notdir $@)$(R)"
 
 # Link
 $(TARGET): $(OBJS)
-	@echo "\n$(BOLD)$(CYAN)Linking: $(BOLD)$(UNDERLINE)$(TARGET)$(RESET)"
+	@printf "\n$(BOLD)$(CYAN)Linking executable:$(R) $(BOLD)$(TARGET)$(R) from $(BOLD)$(words $(OBJS)) Files: "
+	@echo "\n$(BOLD)  [$(foreach var,$(notdir $(OBJS)),														\
+	$(UNDERLINE)$(BOLD)$(BWHITE)$(var)$(R))$(BOLD) ]\nwith \
+	$(BOLD)$(BWHITE)$(words $(CONST_LINKER_FLAGS)) Flags:";													\
+	echo "$(CONST_LINKER_FLAGS)\n";																			\
 	$(COMPILER) $^ $(CONST_LINKER_FLAGS) -o $@
-	@echo "$(BOLD)$(GREEN)DONE BUILDING EXECUTABLE!$(RESET)"
+	@echo "$(BOLD)$(ONBGREEN)$(BLACK) DONE BUILDING EXECUTABLE! $(R)"
 
 # Make the build directory if needed
 $(BUILD_DIR):
-	@echo "\n$(BOLD)$(CYAN)Making build directory:$(RESET)"
+	@echo "\n$(BOLD)$(CYAN)Making build directory:$(R)"
 	mkdir -pv $(BUILD_DIR)
 
 $(BUILD_DIR)/asm:
-	@echo "$(BOLD)$(CYAN)Making build directory for assembly files:$(RESET)"
+	@echo "$(BOLD)$(CYAN)Making build directory for assembly files:$(R)"
 	mkdir -pv $(BUILD_DIR)/asm
 
 $(BUILD_DIR)/preprocessed:
-	@echo "$(BOLD)$(CYAN)Making build directory for preprocessed files:$(RESET)"
+	@echo "$(BOLD)$(CYAN)Making build directory for preprocessed files:$(R)"
 	mkdir -pv $(BUILD_DIR)/preprocessed
 
 # Install target
 .PHONY: install
+.NOTPARALLEL: install
 install: clean
 	@$(MAKE) target RELEASE=true
-	@echo "\n$(BOLD)$(CYAN)Installing $(TARGET) at $(INSTALL_DIR):$(RESET)"
+	@echo "\n$(BOLD)$(CYAN)Installing $(TARGET) at $(INSTALL_DIR):$(R)"
 	@cp -fv $(TARGET) $(INSTALL_DIR) || sudo mv -iv $(TARGET) $(INSTALL_DIR)
 
 # Uninstall target
 .PHONY: uninstall
 uninstall:
-	@echo "$(BOLD)$(CYAN)Uninstalling $(INSTALL_DIR)/$(TARGET)$(RESET)"
+	@echo "$(BOLD)$(CYAN)Uninstalling $(INSTALL_DIR)/$(TARGET)$(R)"
 	@rm -rfv $(INSTALL_DIR)/$(TARGET) || sudo rm -rfv $(INSTALL_DIR)/$(TARGET)
-	@echo "$(BOLD)$(GREEN)DONE UNINSTALLING!$(RESET)"
+	@echo "$(BOLD)$(GREEN)DONE UNINSTALLING!$(R)"
 
 # Clean Object files
 .PHONY: clean
 clean:
-	@echo "\n$(BOLD)$(CYAN)Removing object files:$(RESET)"
+	@echo "\n$(BOLD)$(CYAN)Removing object files:$(R)"
 	@rm -fv $(OBJS)
-	@echo
 	@sleep 0.1
 
 # Clean out file and objects
 .PHONY:cleanall
-cleanall: clean
-	@echo "\n$(BOLD)$(CYAN)Removing executable:$(RESET)"
+cleanall:
+	@echo "$(BOLD)$(CYAN)Removing executable:$(R)"
 	rm -fv $(TARGET)
+	@echo "$(BOLD)$(CYAN)Removing build directory:$(R)"
 	rm -rfv $(BUILD_DIR)
 
 # help target
 .PHONY: help
 help:
-	@echo "\n$(BOLD)$(CYAN)Help for this Makefile:$(RESET)"
-	@echo "Invoke $(BWHITE)\"make\"$(RESET)                      to build $(BOLD)$(TARGET)$(RESET)"
-	@echo "or     $(BWHITE)\"make [target] [option(s)]\"$(RESET) to specify a target and/or options."
+	@echo "\n$(BOLD)$(CYAN)Help for this Makefile:$(R)"
+	@echo "Invoke $(BWHITE)\"make\"$(R)                      to build $(BOLD)$(TARGET)$(R)"
+	@echo "or     $(BWHITE)\"make [target] [option(s)]\"$(R) to specify a target and/or options."
 	@echo
-	@echo "The following are the valid $(BWHITE)targets$(RESET) for this Makefile:"
-	@echo "... $(BOLD)all$(RESET)               build the executable, assembly files and preprocessed files"
-	@echo "... $(BOLD)target$(RESET)            make the executable"
-	@echo "... $(BOLD)install$(RESET)           make and move the executable to $(INSTALL_DIR)"
-	@echo "... $(BOLD)uninstall$(RESET)         removes the executable from $(INSTALL_DIR)"
-	@echo "... $(BOLD)help$(RESET)              prints this help message"
-	@echo "... $(BOLD)assemble$(RESET)          compiles the source files into assembly files in the build directory ($(BUILD_DIR))"
-	@echo "... $(BOLD)preprocess$(RESET)        compiles the source files into preprocessed files in the build directory ($(BUILD_DIR))"
-	@echo "... $(BOLD)clean$(RESET)             removes the build directory and its contents like object files"
-	@echo "... $(BOLD)cleanall$(RESET)          removes all of the above and also the executable inside this folder"
-	@echo "also the following are valid targets:"
-	@echo "... $(BOLD)$(TARGET)$(RESET)\n\
-	$(foreach obj,$(OBJS),... $(BOLD)$(obj)$(RESET))\n\
-	$(foreach doti,$(DOTI),... $(BOLD)$(doti)$(RESET))\n\
-	$(foreach asm,$(ASMS),... $(BOLD)$(asm)$(RESET))\n\
+	@echo "The following are the valid $(BWHITE)targets$(R) for this Makefile:"
+	@echo "... $(BOLD)all$(R)               build the executable, assembly files and preprocessed files"
+	@echo "... $(BOLD)target$(R)            make the executable"
+	@echo "... $(BOLD)install$(R)           make and move the executable to $(INSTALL_DIR)"
+	@echo "... $(BOLD)uninstall$(R)         removes the executable from $(INSTALL_DIR)"
+	@echo "... $(BOLD)help$(R)              prints this help message"
+	@echo "... $(BOLD)assemble$(R)          compiles the source files into assembly files in the build directory ($(BUILD_DIR))"
+	@echo "... $(BOLD)preprocess$(R)        compiles the source files into preprocessed files in the build directory ($(BUILD_DIR))"
+	@echo "... $(BOLD)clean$(R)             removes the build directory and its contents like object files"
+	@echo "... $(BOLD)cleanall$(R)          removes all of the above and also the executable inside this folder"
+	@echo "\nalso the following are valid targets:"
+	@echo "... $(BOLD)$(TARGET)$(R)\n\
+	$(foreach obj,$(OBJS),... $(BOLD)$(obj)$(R))\n\
+	$(foreach doti,$(DOTI),... $(BOLD)$(doti)$(R))\n\
+	$(foreach asm,$(ASMS),... $(BOLD)$(asm)$(R))\n\
 	\n"
-	@echo "The following are the valid $(BWHITE)options$(RESET) for this Makefile:"
-	@echo "... $(BOLD)RELEASE=$(RESET)          set to 'true' for release build, false for debug build,\n \
-	                                                                           $(BBLACK)default is$(RESET) $(RELEASE)"
-	@echo "... $(BOLD)BUILD_DIR=$(RESET)        directory, where intermediate files will be stored,   $(BBLACK)default is$(RESET) $(BUILD_DIR)"
-	@echo "... $(BOLD)SRC_DIR=$(RESET)          directory, where make will look for source files,     $(BBLACK)default is$(RESET) $(SRC_DIR)"
-	@echo "... $(BOLD)HDR_DIR=$(RESET)          directory, where make will look for header files,     $(BBLACK)default is$(RESET) $(HDR_DIR)"
-	@echo "... $(BOLD)INSTALL_DIR=$(RESET)      directory, where the executable will be installed to, $(BBLACK)default is$(RESET) $(INSTALL_DIR)"
-	@echo "... $(BOLD)COMPILER=$(RESET)         compiler to use,                                      $(BBLACK)default is$(RESET) $(COMPILER)"
-	@echo "... $(BOLD)COMPILER_FLAGS=$(RESET)   compiler flags to use,                                $(BBLACK)default is$(RESET) empty"
-	@echo "... $(BOLD)STANDARD=$(RESET)         C++ standard to use,                                  $(BBLACK)default is$(RESET) $(STANDARD)"
-	@echo "... $(BOLD)LINKER_FLAGS=$(RESET)     linker flags to use,                                  $(BBLACK)default is$(RESET) empty"
+	@echo "The following are the valid $(BWHITE)options$(R) for this Makefile:"
+	@echo "... $(BOLD)RELEASE=$(R)          set to 'true' for release build, false for debug build,\n \
+	$(BBLACK)                                                                           default is$(R) $(RELEASE)"
+	@echo "... $(BOLD)BUILD_DIR=$(R)        directory, where intermediate files will be stored,$(BBLACK)   $(R)default is $(BWHITE)$(BUILD_DIR)"
+	@echo "... $(BOLD)SRC_DIR=$(R)          directory, where make will look for source files,$(BBLACK)     $(R)default is $(BWHITE)$(SRC_DIR)"
+	@echo "... $(BOLD)HDR_DIR=$(R)          directory, where make will look for header files,$(BBLACK)     $(R)default is $(BWHITE)$(HDR_DIR)"
+	@echo "... $(BOLD)INSTALL_DIR=$(R)      directory, where the executable will be installed to,$(BBLACK) $(R)default is $(BWHITE)$(INSTALL_DIR)"
+	@echo "... $(BOLD)COMPILER=$(R)         compiler to use,$(BBLACK)                                      $(R)default is $(BWHITE)$(COMPILER)"
+	@echo "... $(BOLD)COMPILER_FLAGS=$(R)   compiler flags to use,$(BBLACK)                                $(R)default is $(BWHITE)empty"
+	@echo "... $(BOLD)STANDARD=$(R)         C++ standard to use,$(BBLACK)                                  $(R)default is $(BWHITE)$(STANDARD)"
+	@echo "... $(BOLD)LINKER_FLAGS=$(R)     linker flags to use,$(BBLACK)                                  $(R)default is $(BWHITE)empty"
 
 
 DONEOBJS := 0
@@ -235,8 +268,7 @@ NEEDEDOBJS := $(shell \
 	done; \
 	echo $$count \
 )
-override REBUILD_OBJS := $(shell \
-	i=0; \
+REBUILD_OBJS := $(shell i=0; \
 	for src in $(SRCS); do \
 		obj=$$(echo $(OBJS) | cut -d" " -f$$((i+1))); \
 		ts_src=$$(stat -c %Y $$src 2>/dev/null || echo 0); \
@@ -245,3 +277,4 @@ override REBUILD_OBJS := $(shell \
 		i=$$((i+1)); \
 	done \
 )
+
