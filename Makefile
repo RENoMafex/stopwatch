@@ -11,7 +11,7 @@ MAKEFLAGS += --no-print-directory
 #######################
 
 .PHONY: defaulttarget
-defaulttarget: target		# Set this to 'target' to build the executable, 'all' to build everything
+defaulttarget: target		# Set this to 'target' to build the executable, 'all' to build everything, rebuild for a fresh build every time
 
 # Set this to true for release build, false for debug build
 RELEASE ?= false
@@ -21,7 +21,8 @@ COMPILER ?= g++
 COMPILER_FLAGS =
 STANDARD = c++17
 LINKER_FLAGS = -lncurses
-WARNINGS = -Wall -Wextra -Wpedantic -Wshadow -Wconversion -Wsign-conversion -Wnull-dereference -Wdouble-promotion -Wformat=2 -Winvalid-pch -Wduplicated-cond -Wduplicated-branches -Wlogical-op -Wcast-qual -Wcast-align -Wstrict-aliasing=2
+WARNINGS = -Wall -Wextra -Wpedantic -Wshadow -Wconversion -Wsign-conversion -Wnull-dereference -Wdouble-promotion \
+-Wformat=2 -Winvalid-pch -Wduplicated-cond -Wduplicated-branches -Wlogical-op -Wcast-qual -Wcast-align -Wstrict-aliasing=2
 
 # Directories
 SRC_DIR ?= src
@@ -43,7 +44,7 @@ TARGET = stopwatch
 # END OF SETUP #
 ################
 
-# .NOTPARALLEL: install
+.NOTPARALLEL: install
 
 # Some ASCII Escapes as constants
 override R = \033[0m
@@ -175,6 +176,7 @@ $(TARGET): $(OBJS)
 	@echo "$(BOLD)$(ONBGREEN)$(BLACK) DONE BUILDING EXECUTABLE! $(R)"
 
 # Make the build directory if needed
+.PHONY: $(BUILD_DIR)
 $(BUILD_DIR):
 	@echo "\n$(BOLD)$(CYAN)Making build directory:$(R)"
 	mkdir -pv $(BUILD_DIR)
@@ -217,6 +219,15 @@ cleanall:
 	@echo "$(BOLD)$(CYAN)Removing build directory:$(R)"
 	rm -rfv $(BUILD_DIR)
 
+# Rebuild
+.PHONY: rebuild
+rebuild: clean init_rebuild target
+
+.PHONY: init_rebuild
+init_rebuild:
+	$(eval NEEDEDOBJS = $(words $(OBJS)))
+	$(eval REBUILD_OBJS = $(OBJS))
+
 # help target
 .PHONY: help
 help:
@@ -227,6 +238,7 @@ help:
 	@echo "The following are the valid $(BWHITE)targets$(R) for this Makefile:"
 	@echo "... $(BOLD)all$(R)               build the executable, assembly files and preprocessed files"
 	@echo "... $(BOLD)target$(R)            make the executable"
+	@echo "... $(BOLD)rebuild$(R)           remake the executable from scratch"
 	@echo "... $(BOLD)install$(R)           make and move the executable to $(INSTALL_DIR)"
 	@echo "... $(BOLD)uninstall$(R)         removes the executable from $(INSTALL_DIR)"
 	@echo "... $(BOLD)help$(R)              prints this help message"
