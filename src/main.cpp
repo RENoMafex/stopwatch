@@ -1,19 +1,18 @@
-#include <chrono>
+#include <ncurses.h>
 #include <iostream>
-#include <string_view>
-#include <csignal>
-#include <atomic>
+#include <string>
 
-// #include "stopwatch_utils.hpp"
-#include "shortint.hpp"
+#pragma region redefines
+#ifdef KEY_ENTER
+#undef KEY_ENTER
+#endif
+#ifdef KEY_SPACE
+#undef KEY_SPACE
+#endif
+#define KEY_ENTER 10
+#define KEY_SPACE 32
+#pragma endregion
 
-#define unused [[maybe_unused]]
+int main(){
 
-std::atomic<bool>stop_flag = false;
-
-
-int main(unused int argc, unused char** argv){
-	std::signal(SIGINT, [](int){stop_flag = true;});
-
-	std::cout << "00:00:00.000";
 }
