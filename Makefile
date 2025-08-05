@@ -20,7 +20,7 @@ RELEASE ?= false
 COMPILER ?= g++
 COMPILER_FLAGS =
 STANDARD = c++17
-LINKER_FLAGS = -lncurses
+LINKER_FLAGS =
 WARNINGS = -Wall -Wextra -Wpedantic -Wshadow -Wconversion -Wsign-conversion -Wnull-dereference -Wdouble-promotion -Wformat=2 -Winvalid-pch -Wduplicated-cond -Wduplicated-branches -Wlogical-op -Wcast-qual -Wcast-align -Wstrict-aliasing=2
 
 # Directories
