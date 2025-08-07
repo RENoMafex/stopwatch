@@ -11,7 +11,7 @@ MAKEFLAGS += --no-print-directory
 #######################
 
 .PHONY: defaulttarget
-defaulttarget: target		# Set this to 'target' to build the executable, 'all' to build everything, rebuild for a fresh build every time
+defaulttarget: target # Set this to 'target' to build the executable, 'all' to build everything, rebuild for a fresh build every time
 
 # Set this to true for release build, false for debug build
 RELEASE ?= false
@@ -20,6 +20,7 @@ RELEASE ?= false
 COMPILER ?= g++
 COMPILER_FLAGS =
 STANDARD = c++17
+LINKER ?= $(COMPILER)
 LINKER_FLAGS = -lncurses
 WARNINGS = -Wall -Wextra -Wpedantic -Wshadow -Wconversion -Wsign-conversion -Wnull-dereference -Wdouble-promotion \
 -Wformat=2 -Winvalid-pch -Wduplicated-cond -Wduplicated-branches -Wlogical-op -Wcast-qual -Wcast-align -Wstrict-aliasing=2
@@ -48,7 +49,7 @@ TARGET = stopwatch
 
 # Some ASCII Escapes as constants
 override R = \033[0m
-override BOLD = \033[1m
+override B = \033[1m
 override ITALIC = \033[36m
 override UNDERLINE = \033[4m
 override SWAPBGFG = \033[7m
@@ -89,26 +90,26 @@ override ONBWHITE = \033[107m
 ifeq ($(RELEASE),true) # Release Flags
 override CONST_COMPILER_FLAGS = $(COMPILER_FLAGS) $(WARNINGS) -std=$(STANDARD) -flto -O3 -DNDEBUG -I$(HDR_DIR)
 override CONST_LINKER_FLAGS = $(LINKER_FLAGS) -flto -O3
-$(shell echo 1>&2 "$(BOLD)$(GREEN)=== USING RELEASE CONFIGURATION ===$(R)")
-$(shell echo 1>&2        "$(GREEN) This Build will utilize the best$(R)")
-$(shell echo 1>&2        "$(GREEN)possible optimizations towards file$(R)")
-$(shell echo 1>&2        "$(GREEN)      size and performance!$(R)")
-$(shell echo 1>&2        "$(GREEN)$(R)")
+$(shell echo 1>&2 "$(B)$(GREEN)=== USING RELEASE CONFIGURATION ===$(R)")
+$(shell echo 1>&2     "$(GREEN) This Build will utilize the best$(R)")
+$(shell echo 1>&2     "$(GREEN)possible optimizations towards file$(R)")
+$(shell echo 1>&2     "$(GREEN)      size and performance!$(R)")
+$(shell echo 1>&2     "$(GREEN)$(R)")
 else # Debug Flags
 override CONST_COMPILER_FLAGS = $(COMPILER_FLAGS) $(WARNINGS) -std=$(STANDARD) -g -O0 -I$(HDR_DIR)
 override CONST_LINKER_FLAGS = $(LINKER_FLAGS) -g -O0
-$(shell echo 1>&2 "$(BOLD)$(YELLOW)=== USING DEBUG CONFIGURATION ===$(R)")
-$(shell echo 1>&2        "$(YELLOW) This Build will not utilize any $(R)")
-$(shell echo 1>&2        "$(YELLOW) optimizations at all, this mode $(R)")
-$(shell echo 1>&2        "$(YELLOW) focuses on fast build times and $(R)")
-$(shell echo 1>&2        "$(YELLOW)           debugability! $(R)")
-$(shell echo 1>&2        "$(YELLOW)  $(R)")
+$(shell echo 1>&2 "$(B)$(YELLOW)=== USING DEBUG CONFIGURATION ===$(R)")
+$(shell echo 1>&2     "$(YELLOW) This Build will not utilize any $(R)")
+$(shell echo 1>&2     "$(YELLOW) optimizations at all, this mode $(R)")
+$(shell echo 1>&2     "$(YELLOW) focuses on fast build times and $(R)")
+$(shell echo 1>&2     "$(YELLOW)           debugability! $(R)")
+$(shell echo 1>&2     "$(YELLOW)$(R)")
 endif
 
 ifneq (,$(findstring B,$(MAKEFLAGS)))
 override NEEDEDOBJS = $(words $(OBJS))
 override REBUILD_OBJS = $(OBJS)
-$(shell echo 1>&2 "$(BOLD)$(GREEN)=== ALWAYS MAKE MODE DETECTED ===$(R)")
+$(shell echo 1>&2 "$(B)$(GREEN)=== ALWAYS MAKE MODE DETECTED ===$(R)")
 endif
 
 # Build executable, assembly files and preprocessed files
@@ -119,74 +120,73 @@ all: $(DOTI) $(ASMS) $(TARGET)
 .PHONY: target
 target: $(TARGET)
 
-
 # Compile
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp $(HDRS) | $(BUILD_DIR)
 	@if [ "$(findstring j,$(MAKEFLAGS))" = "j" ]; then															\
-	echo "\n$(YELLOW)$(BOLD)=== PARALLEL COMPILING DETECTED ===";												\
+	echo "\n$(YELLOW)$(B)=== PARALLEL COMPILING DETECTED ===";												\
 	echo "$(YELLOW)This means, the progress shown might";														\
 	echo "         $(YELLOW)be not accurate!";																	\
 	fi
 	@if [ "$@" = "$(firstword $(REBUILD_OBJS))" ]; then															\
-		printf "\n$(BOLD)$(CYAN)Compiling:$(R) $(BOLD)$(BWHITE)$(NEEDEDOBJS) Files: ";							\
-		echo "\n  $(BOLD)[$(foreach var,$(notdir $(REBUILD_OBJS)), 												\
-	$(UNDERLINE)$(BOLD)$(BWHITE)$(var)$(R))$(BOLD) ]\nwith $(BOLD)$(BWHITE)$(words $(CONST_COMPILER_FLAGS)) \
+		printf "\n$(B)$(CYAN)Compiling:$(R) $(B)$(BWHITE)$(NEEDEDOBJS) Files: ";							\
+		echo "\n  $(B)[$(foreach var,$(notdir $(REBUILD_OBJS)), 												\
+	$(UNDERLINE)$(B)$(BWHITE)$(var)$(R))$(B) ]\nwith $(B)$(BWHITE)$(words $(CONST_COMPILER_FLAGS)) \
 	Flags:";																									\
 	echo "$(CONST_COMPILER_FLAGS)\n";																			\
 	else																										\
 		echo;																									\
 	fi;
 	@sleep 0.1
-	@echo "$(BMAGENTA)$(UNDERLINE)Now Compiling:$(R) $(BOLD)$< $(R)into $(BOLD)$(dir $@)$(UNDERLINE)$(notdir $@)$(R)"
+	@echo "$(BMAGENTA)$(UNDERLINE)Now Compiling:$(R) $(B)$< $(R)into $(B)$(dir $@)$(UNDERLINE)$(notdir $@)$(R)"
 	@$(COMPILER) -c $< -o $@ $(CONST_COMPILER_FLAGS)
-	@echo "$(GREEN)$(UNDERLINE)Done compiling$(R) $(BOLD)$(UNDERLINE)$(notdir $@)$(R)"
+	@echo "$(GREEN)$(UNDERLINE)Done compiling$(R) $(B)$(UNDERLINE)$(notdir $@)$(R)"
 	@$(eval DONEOBJS = $(shell expr $(DONEOBJS) + "1"))
-	@printf "$(BOLD)$(CYAN)Progress: $(BOLD)$(GREEN)%.0f%%$(R)\n" $(shell echo "scale=2; ($(DONEOBJS) * 100) / $(NEEDEDOBJS)" | bc)
+	@printf "$(B)$(CYAN)Progress: $(B)$(GREEN)%.0f%%$(R)\n" $(shell echo "scale=2; ($(DONEOBJS) * 100) / $(NEEDEDOBJS)" | bc)
 
 # Assemble
 .PHONY: assemble
 assemble: $(ASMS)
 $(BUILD_DIR)/asm/%.s: $(SRC_DIR)/%.cpp $(HDRS) | $(BUILD_DIR)/asm
 	@if [ "$@" = "$(firstword $(ASMS))" ]; then																	\
-		printf "\n$(BOLD)$(CYAN)Assembling:$(R)\n";															\
+		printf "\n$(B)$(CYAN)Assembling:$(R)\n";															\
 	fi
-	@echo "$(BMAGENTA)$(UNDERLINE)Now Assembling:$(R) $(BOLD)$< $(R)into $(BOLD)$(dir $@)$(UNDERLINE)$(notdir $@)$(R)"
+	@echo "$(BMAGENTA)$(UNDERLINE)Now Assembling:$(R) $(B)$< $(R)into $(B)$(dir $@)$(UNDERLINE)$(notdir $@)$(R)"
 	@$(COMPILER) -S $< -o $@ $(CONST_COMPILER_FLAGS)
-	@echo "$(GREEN)$(UNDERLINE)Done assembling$(R) $(BOLD)$(UNDERLINE)$(notdir $@)$(R)"
+	@echo "$(GREEN)$(UNDERLINE)Done assembling$(R) $(B)$(UNDERLINE)$(notdir $@)$(R)"
 
 # Preprocess
 .PHONY: preprocess
 preprocess: $(DOTI)
 $(BUILD_DIR)/preprocessed/%.i: $(SRC_DIR)/%.cpp $(HDRS) | $(BUILD_DIR)/preprocessed
 	@if [ "$@" = "$(firstword $(DOTI))" ]; then																	\
-		printf "\n$(BOLD)$(CYAN)Preprocessing:$(R)\n";														\
+		printf "\n$(B)$(CYAN)Preprocessing:$(R)\n";														\
 	fi
-	@echo "$(BMAGENTA)$(UNDERLINE)Now Preprocessing:$(R) $(BOLD)$< $(R)into $(BOLD)$(dir $@)$(UNDERLINE)$(notdir $@)$(R)"
+	@echo "$(BMAGENTA)$(UNDERLINE)Now Preprocessing:$(R) $(B)$< $(R)into $(B)$(dir $@)$(UNDERLINE)$(notdir $@)$(R)"
 	@$(COMPILER) -E $< -o $@ $(CONST_COMPILER_FLAGS)
-	@echo "$(GREEN)$(UNDERLINE)Done preprocessing$(R) $(BOLD)$(UNDERLINE)$(notdir $@)$(R)"
+	@echo "$(GREEN)$(UNDERLINE)Done preprocessing$(R) $(B)$(UNDERLINE)$(notdir $@)$(R)"
 
 # Link
 $(TARGET): $(OBJS)
-	@printf "\n$(BOLD)$(CYAN)Linking executable:$(R) $(BOLD)$(TARGET)$(R) from $(BOLD)$(words $(OBJS)) Files: "
-	@echo "\n$(BOLD)  [$(foreach var,$(notdir $(OBJS)),														\
-	$(UNDERLINE)$(BOLD)$(BWHITE)$(var)$(R))$(BOLD) ]\nwith \
-	$(BOLD)$(BWHITE)$(words $(CONST_LINKER_FLAGS)) Flags:";													\
+	@printf "\n$(B)$(CYAN)Linking executable:$(R) $(B)$(TARGET)$(R) from $(B)$(words $(OBJS)) Files: "
+	@echo "\n$(B)  [$(foreach var,$(notdir $(OBJS)),														\
+	$(UNDERLINE)$(B)$(BWHITE)$(var)$(R))$(B) ]\nwith \
+	$(B)$(BWHITE)$(words $(CONST_LINKER_FLAGS)) Flags:";													\
 	echo "$(CONST_LINKER_FLAGS)\n";																			\
-	$(COMPILER) $^ $(CONST_LINKER_FLAGS) -o $@
-	@echo "$(BOLD)$(ONBGREEN)$(BLACK) DONE BUILDING EXECUTABLE! $(R)"
+	$(LINKER) $^ $(CONST_LINKER_FLAGS) -o $@
+	@echo "$(B)$(ONBGREEN)$(BLACK) DONE BUILDING EXECUTABLE! $(R)"
 
 # Make the build directory if needed
 .PHONY: $(BUILD_DIR)
-$(BUILD_DIR):
-	@echo "\n$(BOLD)$(CYAN)Making build directory:$(R)"
+$(BUILD_DIR)/:
+	@echo "\n$(B)$(CYAN)Making build directory:$(R)"
 	mkdir -pv $(BUILD_DIR)
 
 $(BUILD_DIR)/asm:
-	@echo "$(BOLD)$(CYAN)Making build directory for assembly files:$(R)"
+	@echo "$(B)$(CYAN)Making build directory for assembly files:$(R)"
 	mkdir -pv $(BUILD_DIR)/asm
 
 $(BUILD_DIR)/preprocessed:
-	@echo "$(BOLD)$(CYAN)Making build directory for preprocessed files:$(R)"
+	@echo "$(B)$(CYAN)Making build directory for preprocessed files:$(R)"
 	mkdir -pv $(BUILD_DIR)/preprocessed
 
 # Install target
@@ -194,29 +194,29 @@ $(BUILD_DIR)/preprocessed:
 .NOTPARALLEL: install
 install: clean
 	@$(MAKE) target RELEASE=true
-	@echo "\n$(BOLD)$(CYAN)Installing $(TARGET) at $(INSTALL_DIR):$(R)"
+	@echo "\n$(B)$(CYAN)Installing $(TARGET) at $(INSTALL_DIR):$(R)"
 	@cp -fv $(TARGET) $(INSTALL_DIR) || sudo mv -iv $(TARGET) $(INSTALL_DIR)
 
 # Uninstall target
 .PHONY: uninstall
 uninstall:
-	@echo "$(BOLD)$(CYAN)Uninstalling $(INSTALL_DIR)/$(TARGET)$(R)"
+	@echo "$(B)$(CYAN)Uninstalling $(INSTALL_DIR)/$(TARGET)$(R)"
 	@rm -rfv $(INSTALL_DIR)/$(TARGET) || sudo rm -rfv $(INSTALL_DIR)/$(TARGET)
-	@echo "$(BOLD)$(GREEN)DONE UNINSTALLING!$(R)"
+	@echo "$(B)$(GREEN)DONE UNINSTALLING!$(R)"
 
 # Clean Object files
 .PHONY: clean
 clean:
-	@echo "\n$(BOLD)$(CYAN)Removing object files:$(R)"
+	@echo "\n$(B)$(CYAN)Removing object files:$(R)"
 	@rm -fv $(OBJS)
 	@sleep 0.1
 
 # Clean out file and objects
 .PHONY:cleanall
 cleanall:
-	@echo "$(BOLD)$(CYAN)Removing executable:$(R)"
+	@echo "$(B)$(CYAN)Removing executable:$(R)"
 	rm -fv $(TARGET)
-	@echo "$(BOLD)$(CYAN)Removing build directory:$(R)"
+	@echo "$(B)$(CYAN)Removing build directory:$(R)"
 	rm -rfv $(BUILD_DIR)
 
 # Rebuild
@@ -231,38 +231,57 @@ init_rebuild:
 # help target
 .PHONY: help
 help:
-	@echo "\n$(BOLD)$(CYAN)Help for this Makefile:$(R)"
-	@echo "Invoke $(BWHITE)\"make\"$(R)                      to build $(BOLD)$(TARGET)$(R)"
+	@echo "\n$(B)$(CYAN)Help for this Makefile:$(R)"
+	@echo "Invoke $(BWHITE)\"make\"$(R)                      to build $(B)$(TARGET)$(R)"
 	@echo "or     $(BWHITE)\"make [target] [option(s)]\"$(R) to specify a target and/or options."
 	@echo
 	@echo "The following are the valid $(BWHITE)targets$(R) for this Makefile:"
-	@echo "... $(BOLD)all$(R)               build the executable, assembly files and preprocessed files"
-	@echo "... $(BOLD)target$(R)            make the executable"
-	@echo "... $(BOLD)rebuild$(R)           remake the executable from scratch"
-	@echo "... $(BOLD)install$(R)           make and move the executable to $(INSTALL_DIR)"
-	@echo "... $(BOLD)uninstall$(R)         removes the executable from $(INSTALL_DIR)"
-	@echo "... $(BOLD)help$(R)              prints this help message"
-	@echo "... $(BOLD)assemble$(R)          compiles the source files into assembly files in the build directory ($(BUILD_DIR))"
-	@echo "... $(BOLD)preprocess$(R)        compiles the source files into preprocessed files in the build directory ($(BUILD_DIR))"
-	@echo "... $(BOLD)clean$(R)             removes the build directory and its contents like object files"
-	@echo "... $(BOLD)cleanall$(R)          removes all of the above and also the executable inside this folder"
+	@echo "... $(B)all$(R)             build the executable, assembly files and preprocessed files"
+	@echo "... $(B)target$(R)          make the executable"
+	@echo "... $(B)rebuild$(R)         remake the executable from scratch"
+	@echo "... $(B)install$(R)         make and move the executable to $(INSTALL_DIR)"
+	@echo "... $(B)uninstall$(R)       removes the executable from $(INSTALL_DIR)"
+	@echo "... $(B)help$(R)            prints this help message"
+	@echo "... $(B)assemble$(R)        compiles the source files into assembly files in the build directory ($(BUILD_DIR))"
+	@echo "... $(B)preprocess$(R)      compiles the source files into preprocessed files in the build directory ($(BUILD_DIR))"
+	@echo "... $(B)clean$(R)           removes the build directory and its contents like object files"
+	@echo "... $(B)cleanall$(R)        removes all of the above and also the executable inside this folder"
 	@echo "\nalso the following are valid targets:"
-	@echo "... $(BOLD)$(TARGET)$(R)\n\
-	$(foreach obj,$(OBJS),... $(BOLD)$(obj)$(R))\n\
-	$(foreach doti,$(DOTI),... $(BOLD)$(doti)$(R))\n\
-	$(foreach asm,$(ASMS),... $(BOLD)$(asm)$(R))\n\
+#	@echo "... $(B)$(TARGET)$(R)\n\
+	... $(B)$(foreach obj,$(OBJS),$(notdir $(obj)),)\n$(R)\
+	... $(B)$(foreach doti,$(DOTI),$(notdir $(doti)),)\n$(R)\
+	... $(B)$(foreach asm,$(ASMS),$(notdir $(asm)),)\n$(R)\
+	\n"
+	@echo "... $(B)$(TARGET)$(R)\n\
+	... $(B)$(foreach obj,$(OBJS),$(obj),)\n$(R)\
+	... $(B)$(foreach doti,$(DOTI),$(doti),)\n$(R)\
+	... $(B)$(foreach asm,$(ASMS),$(asm),)\n$(R)\
 	\n"
 	@echo "The following are the valid $(BWHITE)options$(R) for this Makefile:"
-	@echo "... $(BOLD)RELEASE=$(R)          set to 'true' for release build, false for debug build,\n \
-	$(BBLACK)                                                                           default is$(R) $(RELEASE)"
-	@echo "... $(BOLD)BUILD_DIR=$(R)        directory, where intermediate files will be stored,$(BBLACK)   $(R)default is $(BWHITE)$(BUILD_DIR)"
-	@echo "... $(BOLD)SRC_DIR=$(R)          directory, where make will look for source files,$(BBLACK)     $(R)default is $(BWHITE)$(SRC_DIR)"
-	@echo "... $(BOLD)HDR_DIR=$(R)          directory, where make will look for header files,$(BBLACK)     $(R)default is $(BWHITE)$(HDR_DIR)"
-	@echo "... $(BOLD)INSTALL_DIR=$(R)      directory, where the executable will be installed to,$(BBLACK) $(R)default is $(BWHITE)$(INSTALL_DIR)"
-	@echo "... $(BOLD)COMPILER=$(R)         compiler to use,$(BBLACK)                                      $(R)default is $(BWHITE)$(COMPILER)"
-	@echo "... $(BOLD)COMPILER_FLAGS=$(R)   compiler flags to use,$(BBLACK)                                $(R)default is $(BWHITE)empty"
-	@echo "... $(BOLD)STANDARD=$(R)         C++ standard to use,$(BBLACK)                                  $(R)default is $(BWHITE)$(STANDARD)"
-	@echo "... $(BOLD)LINKER_FLAGS=$(R)     linker flags to use,$(BBLACK)                                  $(R)default is $(BWHITE)empty"
+	@echo "... $(B)RELEASE=$(R)        set to '$(BWHITE)true$(R)' for release build, false for debug build,\
+	    default is $(BWHITE)$(RELEASE)"
+	@echo "... $(B)BUILD_DIR=$(R)      directory, where intermediate files will be stored         default is $(BWHITE)$(BUILD_DIR)"
+	@echo "... $(B)SRC_DIR=$(R)        directory, where make will look for source files           default is $(BWHITE)$(SRC_DIR)"
+	@echo "... $(B)HDR_DIR=$(R)        directory, where make will look for header files           default is $(BWHITE)$(HDR_DIR)"
+	@echo "... $(B)INSTALL_DIR=$(R)    directory, where the executable will be installed to       default is $(BWHITE)$(INSTALL_DIR)"
+	@echo "... $(B)COMPILER=$(R)       compiler to use                                            default is $(BWHITE)$(COMPILER)"
+	@echo "... $(B)COMPILER_FLAGS=$(R) compiler flags to use                                      default is $(BBLACK)empty"
+	@echo "... $(B)STANDARD=$(R)       C++ standard to use                                        default is $(BWHITE)$(STANDARD)"
+	@echo "... $(B)LINKER=$(R)         linker to use                                              default is $(BWHITE)$(LINKER)"
+	@echo "... $(B)LINKER_FLAGS=$(R)   linker flags to use                                        default is $(BBLACK)empty"
+
+# $(notdir $(BUILD_DIR)/preprocessed/%.i):
+# 	@printf "$(B)"
+# 	$(MAKE) $(BUILD_DIR)/preprocessed/$@ $(MAKEFLAGS)
+
+# $(notdir $(BUILD_DIR)/%.o):
+# 	@printf "$(B)"
+# 	$(MAKE) $(BUILD_DIR)/$@ $(MAKEFLAGS)
+
+# $(notdir $(BUILD_DIR)/asm/%.s):
+# 	@printf "$(B)"
+# 	$(MAKE) $(BUILD_DIR)/asm/$@ $(MAKEFLAGS)
+
 
 
 DONEOBJS := 0
