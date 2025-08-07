@@ -7,10 +7,17 @@
 #include <string_view>
 #include <chrono>
 #include <shortint.hpp>
-#include <functional>
 #include <thread>
+#include <vector>
+#include <array>
+#include <tuple>
+#include "power.hpp"
 
+#define sc_(T,x) static_cast<T>(x)
+
+/// @brief
 namespace stopwatch{
+	typedef std::vector<std::pair<std::string, std::chrono::steady_clock::time_point>> checkpoints_t;
 	using clock = std::chrono::steady_clock;
 
 	/// @brief Initializes ncurses
@@ -26,6 +33,14 @@ namespace stopwatch{
 	/// @return hours:mins:seconds:milliseconds, 2 digits for minutes and seconds, 3 digits for milliseconds
 	std::string_view make_output(clock::time_point start);
 
-}
+	/// @brief Restores std::chrono::steady_clock::time_point from a std::string
+	/// @param output the string, which holds the time_point (format: "[0-9]+:[0-9]{2}:[0-9]{2}.[0-9]{3}" order: "h min sec ms")
+	/// @return Timepoint
+	clock::time_point get_input(std::string_view output);
 
+	/// @brief adds a checkpoint to the vector
+	/// @param checkpoints the checkpoints object, in which the checkpoint should be added
+	void trig_checkpoint(checkpoints_t &checkpoints);
+
+}
 #endif

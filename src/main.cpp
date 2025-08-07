@@ -1,3 +1,4 @@
+#include <iostream>
 #include "stopwatch.hpp"
 
 #pragma region redefines
@@ -7,13 +8,16 @@
 #ifdef KEY_SPACE
 #undef KEY_SPACE
 #endif
+#ifdef sc_
+#undef sc_
+#endif
 #define KEY_ENTER 10
 #define KEY_SPACE 32
+#define sc_(T,x) static_cast<T>(x)
 #pragma endregion
 
 void clearline();
 void print_help();
-void reg_checkpoint();
 
 int main(){
 	using namespace std::string_literals;
@@ -21,48 +25,76 @@ int main(){
 	namespace sw = stopwatch;
 
 	bool stopflag = false;
-	const auto start = sw::init();
-	u32 current_line = 0;
+	auto start = sw::init();
+
+	int row = 0;
+	int col = 0;
+
+	sw::checkpoints_t checkpoints = {};
 
 	nodelay(stdscr, true);
 
 	while (stopflag == false) {
+		move(row, col);
 		print_help();
 		printw("%s", sw::make_output(start).data());
 		sw::delayMicros(500);
 		refresh();
 
+
 		s32 key = getch();
-		if (key == KEY_SPACE) {
-			reg_checkpoint();
-		} else {
+
+		if (key == KEY_SPACE) [[unlikely]] {
+			row++;
+		} else [[likely]] {
 			clearline();
 		}
 
-		if (key == KEY_ENTER) {
+		if (key == KEY_ENTER) [[unlikely]] {
 			stopflag = true;
 		}
-
-
 	}
-
-
 	endwin();
+	printf("%s", sw::make_output(start).data());
+	printf("%c", '\n');
+	// std::cout << sw::make_output(start) << std::endl; //<- somehow doesnt work?!
+
 	return 0;
-}
+} // main()
+
+#pragma region function_definitions
 
 void clearline(){
 	s32 row = getcury(stdscr);
-	move(0, row);
+	move(row, 0);
 	clrtoeol();
 }
 
 void print_help(){
-/*	using sv = std::string_view;
-//	sv line1 = "How to use:";
-//	sv line2 = "[SPACEBAR] = Register checkpoint";
-//	sv line3 = "[RETURN / ENTER] = Exit";
-//	int max_x = getmaxx(stdscr);
-//	move(max_x - line1.length(),0);
-*/// redo this function, its far from finished, also its shitty right now lol
-}
+	int old_col = getcurx(stdscr);
+	int old_row = getcury(stdscr);
+
+	using sv = std::string_view;
+	using namespace std::string_view_literals;
+	std::vector<sv> lines = {
+		"      How to use:"sv,
+		"[SPACEBAR] = Checkpoint"sv,
+		" [RETURN]  = Exit"sv
+	};
+
+	const s32 max_x = getmaxx(stdscr);
+	s32 help_size = 0;
+	for (const auto line : lines) {
+		help_size = (sc_(s32,(line.length())) > help_size) ? sc_(s32,(line.length())) : help_size;
+	}
+
+	help_size++;
+	move(0, max_x - help_size);
+	attron(A_BOLD);
+	for(auto line : lines){
+		printw("%s", line.data());
+		move(getcury(stdscr) + 1, max_x - help_size);
+	}
+	attroff(A_BOLD);
+	move(old_row, old_col);
+} // void print_help()

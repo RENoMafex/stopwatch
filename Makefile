@@ -11,7 +11,7 @@ MAKEFLAGS += --no-print-directory
 #######################
 
 .PHONY: defaulttarget
-defaulttarget: rebuild # Set this to 'target' to build the executable, 'all' to build everything, rebuild for a fresh build every time
+defaulttarget: target # Set this to 'target' to build the executable, 'all' to build everything, rebuild for a fresh build every time
 
 # Set this to true for release build, false for debug build
 RELEASE ?= false
@@ -177,7 +177,7 @@ $(TARGET): $(OBJS)
 
 # Make the build directory if needed
 .PHONY: $(BUILD_DIR)
-$(BUILD_DIR):
+$(BUILD_DIR)/:
 	@echo "\n$(B)$(CYAN)Making build directory:$(R)"
 	mkdir -pv $(BUILD_DIR)
 
