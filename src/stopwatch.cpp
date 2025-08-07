@@ -5,6 +5,7 @@ stopwatch::clock::time_point stopwatch::init() {
 	noecho();
 	cbreak();
 	clear();
+	curs_set(0);
 	return stopwatch::clock::now();
 }
 
