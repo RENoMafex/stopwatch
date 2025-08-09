@@ -121,7 +121,7 @@ all: $(DOTI) $(ASMS) $(TARGET)
 target: $(TARGET)
 
 # Compile
-$(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp $(HDRS) | $(BUILD_DIR)
+$(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp $(HDRS) | $(BUILD_DIR)/
 	@if [ "$(findstring j,$(MAKEFLAGS))" = "j" ]; then															\
 	echo "\n$(YELLOW)$(B)=== PARALLEL COMPILING DETECTED ===";												\
 	echo "$(YELLOW)This means, the progress shown might";														\
@@ -146,7 +146,7 @@ $(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp $(HDRS) | $(BUILD_DIR)
 # Assemble
 .PHONY: assemble
 assemble: $(ASMS)
-$(BUILD_DIR)/asm/%.s: $(SRC_DIR)/%.cpp $(HDRS) | $(BUILD_DIR)/asm
+$(BUILD_DIR)/asm/%.s: $(SRC_DIR)/%.cpp $(HDRS) | $(BUILD_DIR)/asm/
 	@if [ "$@" = "$(firstword $(ASMS))" ]; then																	\
 		printf "\n$(B)$(CYAN)Assembling:$(R)\n";															\
 	fi
@@ -157,7 +157,7 @@ $(BUILD_DIR)/asm/%.s: $(SRC_DIR)/%.cpp $(HDRS) | $(BUILD_DIR)/asm
 # Preprocess
 .PHONY: preprocess
 preprocess: $(DOTI)
-$(BUILD_DIR)/preprocessed/%.i: $(SRC_DIR)/%.cpp $(HDRS) | $(BUILD_DIR)/preprocessed
+$(BUILD_DIR)/preprocessed/%.i: $(SRC_DIR)/%.cpp $(HDRS) | $(BUILD_DIR)/preprocessed/
 	@if [ "$@" = "$(firstword $(DOTI))" ]; then																	\
 		printf "\n$(B)$(CYAN)Preprocessing:$(R)\n";														\
 	fi
@@ -181,11 +181,11 @@ $(BUILD_DIR)/:
 	@echo "\n$(B)$(CYAN)Making build directory:$(R)"
 	mkdir -pv $(BUILD_DIR)
 
-$(BUILD_DIR)/asm:
+$(BUILD_DIR)/asm/:
 	@echo "$(B)$(CYAN)Making build directory for assembly files:$(R)"
 	mkdir -pv $(BUILD_DIR)/asm
 
-$(BUILD_DIR)/preprocessed:
+$(BUILD_DIR)/preprocessed/:
 	@echo "$(B)$(CYAN)Making build directory for preprocessed files:$(R)"
 	mkdir -pv $(BUILD_DIR)/preprocessed
 
