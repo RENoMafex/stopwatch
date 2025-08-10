@@ -87,6 +87,7 @@ override ONBMAGENTA = \033[105m
 override ONBCYAN = \033[106m
 override ONBWHITE = \033[107m
 
+ifeq (,$(findstring help,$(MAKECMDGOALS)))
 ifeq ($(RELEASE),true) # Release Flags
 override CONST_COMPILER_FLAGS = $(COMPILER_FLAGS) $(WARNINGS) -std=$(STANDARD) -flto -O3 -DNDEBUG -I$(HDR_DIR)
 override CONST_LINKER_FLAGS = $(LINKER_FLAGS) -flto -O3
@@ -104,6 +105,7 @@ $(shell echo 1>&2     "$(YELLOW) optimizations at all, this mode $(R)")
 $(shell echo 1>&2     "$(YELLOW) focuses on fast build times and $(R)")
 $(shell echo 1>&2     "$(YELLOW)           debugability! $(R)")
 $(shell echo 1>&2     "$(YELLOW)$(R)")
+endif
 endif
 
 ifneq (,$(findstring B,$(MAKEFLAGS)))
@@ -197,6 +199,17 @@ install: clean
 	@echo "\n$(B)$(CYAN)Installing $(TARGET) at $(INSTALL_DIR):$(R)"
 	@cp -fv $(TARGET) $(INSTALL_DIR) || sudo mv -iv $(TARGET) $(INSTALL_DIR)
 
+# Release target
+.PHONY: release
+release: clean
+	@$(MAKE) target RELEASE=true
+
+# Debug target
+.PHONY: debug
+debug: clean
+	@$(MAKE) target RELEASE=false
+
+
 # Uninstall target
 .PHONY: uninstall
 uninstall:
@@ -237,7 +250,9 @@ help:
 	@echo
 	@echo "The following are the valid $(BWHITE)targets$(R) for this Makefile:"
 	@echo "... $(B)all$(R)             build the executable, assembly files and preprocessed files"
-	@echo "... $(B)target$(R)          make the executable"
+	@echo "... $(B)release$(R)         build the executable with optimizations for release"
+	@echo "... $(B)debug$(R)           build the executable without optimizations"
+	@echo "... $(B)target$(R)          build the executable"
 	@echo "... $(B)rebuild$(R)         remake the executable from scratch"
 	@echo "... $(B)install$(R)         make and move the executable to $(INSTALL_DIR)"
 	@echo "... $(B)uninstall$(R)       removes the executable from $(INSTALL_DIR)"
