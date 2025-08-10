@@ -125,12 +125,12 @@ target: $(TARGET)
 # Compile
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp $(HDRS) | $(BUILD_DIR)/
 	@if [ "$(findstring j,$(MAKEFLAGS))" = "j" ]; then															\
-	echo "\n$(YELLOW)$(B)=== PARALLEL COMPILING DETECTED ===";												\
+	echo "\n$(YELLOW)$(B)=== PARALLEL COMPILING DETECTED ===";													\
 	echo "$(YELLOW)This means, the progress shown might";														\
 	echo "         $(YELLOW)be not accurate!";																	\
 	fi
 	@if [ "$@" = "$(firstword $(REBUILD_OBJS))" ]; then															\
-		printf "\n$(B)$(CYAN)Compiling:$(R) $(B)$(BWHITE)$(NEEDEDOBJS) Files: ";							\
+		printf "\n$(B)$(CYAN)Compiling:$(R) $(B)$(BWHITE)$(NEEDEDOBJS) Files: ";								\
 		echo "\n  $(B)[$(foreach var,$(notdir $(REBUILD_OBJS)), 												\
 	$(UNDERLINE)$(B)$(BWHITE)$(var)$(R))$(B) ]\nwith $(B)$(BWHITE)$(words $(CONST_COMPILER_FLAGS)) \
 	Flags:";																									\
@@ -150,7 +150,7 @@ $(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp $(HDRS) | $(BUILD_DIR)/
 assemble: $(ASMS)
 $(BUILD_DIR)/asm/%.s: $(SRC_DIR)/%.cpp $(HDRS) | $(BUILD_DIR)/asm/
 	@if [ "$@" = "$(firstword $(ASMS))" ]; then																	\
-		printf "\n$(B)$(CYAN)Assembling:$(R)\n";															\
+		printf "\n$(B)$(CYAN)Assembling:$(R)\n";																\
 	fi
 	@echo "$(BMAGENTA)$(UNDERLINE)Now Assembling:$(R) $(B)$< $(R)into $(B)$(dir $@)$(UNDERLINE)$(notdir $@)$(R)"
 	@$(COMPILER) -S $< -o $@ $(CONST_COMPILER_FLAGS)
@@ -161,7 +161,7 @@ $(BUILD_DIR)/asm/%.s: $(SRC_DIR)/%.cpp $(HDRS) | $(BUILD_DIR)/asm/
 preprocess: $(DOTI)
 $(BUILD_DIR)/preprocessed/%.i: $(SRC_DIR)/%.cpp $(HDRS) | $(BUILD_DIR)/preprocessed/
 	@if [ "$@" = "$(firstword $(DOTI))" ]; then																	\
-		printf "\n$(B)$(CYAN)Preprocessing:$(R)\n";														\
+		printf "\n$(B)$(CYAN)Preprocessing:$(R)\n";																\
 	fi
 	@echo "$(BMAGENTA)$(UNDERLINE)Now Preprocessing:$(R) $(B)$< $(R)into $(B)$(dir $@)$(UNDERLINE)$(notdir $@)$(R)"
 	@$(COMPILER) -E $< -o $@ $(CONST_COMPILER_FLAGS)
@@ -170,10 +170,10 @@ $(BUILD_DIR)/preprocessed/%.i: $(SRC_DIR)/%.cpp $(HDRS) | $(BUILD_DIR)/preproces
 # Link
 $(TARGET): $(OBJS)
 	@printf "\n$(B)$(CYAN)Linking executable:$(R) $(B)$(TARGET)$(R) from $(B)$(words $(OBJS)) Files: "
-	@echo "\n$(B)  [$(foreach var,$(notdir $(OBJS)),														\
+	@echo "\n$(B)  [$(foreach var,$(notdir $(OBJS)),															\
 	$(UNDERLINE)$(B)$(BWHITE)$(var)$(R))$(B) ]\nwith \
-	$(B)$(BWHITE)$(words $(CONST_LINKER_FLAGS)) Flags:";													\
-	echo "$(CONST_LINKER_FLAGS)\n";																			\
+	$(B)$(BWHITE)$(words $(CONST_LINKER_FLAGS)) Flags:";														\
+	echo "$(CONST_LINKER_FLAGS)\n";																				\
 	$(LINKER) $^ $(CONST_LINKER_FLAGS) -o $@
 	@echo "$(B)$(ONBGREEN)$(BLACK) DONE BUILDING EXECUTABLE! $(R)"
 
