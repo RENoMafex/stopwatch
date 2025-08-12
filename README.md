@@ -1,7 +1,6 @@
 # stopwatch
 Well, this is just a very simple stopwatch.
 
-> [!WARNING]
-> This branch is not even functional yet. Dont use it for other things than pull requests, to make a proper ncurses version happening.
+This version only works on systems, that support `ncurses.h`
 
-The crossplatform branch works just fine on linux.
+The crossplatform branch uses only the C++ STL.
