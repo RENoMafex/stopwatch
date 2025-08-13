@@ -46,6 +46,7 @@ int main(){
 
 		if (key == KEY_SPACE) [[unlikely]] {
 			row++;
+			sw::trig_checkpoint(checkpoints, start);
 		} else [[likely]] {
 			clearline();
 		}
@@ -55,8 +56,7 @@ int main(){
 		}
 	}
 	endwin();
-	printf("%s", sw::make_output(start).data());
-	printf("%c", '\n');
+	printf("%s%s%c", "Stopwatch stopped at: ", sw::make_output(start).data(), '\n');
 	// std::cout << sw::make_output(start) << std::endl; //<- somehow doesnt work?!
 
 	return 0;
@@ -79,7 +79,9 @@ void print_help(){
 	std::vector<sv> lines = {
 		"      How to use:"sv,
 		"[SPACEBAR] = Checkpoint"sv,
-		" [RETURN]  = Exit"sv
+		" [RETURN]  = Exit"sv,
+		""sv,
+		"   h:min:sec.ms"sv
 	};
 
 	const s32 max_x = getmaxx(stdscr);

@@ -36,7 +36,7 @@ std::string_view stopwatch::make_output(clock::time_point start) {
 		min.insert(min.begin(), '0');
 	}
 
-	return sv{hrs + ":" + min + ":" + sec + ":" + ms};
+	return sv{hrs + ":" + min + ":" + sec + "." + ms};
 } // stopwatch::make_output()
 
 stopwatch::clock::time_point stopwatch::get_input(std::string_view output) {
@@ -69,7 +69,17 @@ stopwatch::clock::time_point stopwatch::get_input(std::string_view output) {
 
 } // get_input()
 
-	void stopwatch::trig_checkpoint(checkpoints_t &checkpoints) {
+void stopwatch::trig_checkpoint(checkpoints_t &checkpoints, clock::time_point start) {
+	auto now = clock::now();
+	auto dur = now.time_since_epoch();
+	auto millis = std::chrono::duration_cast<std::chrono::milliseconds>(dur);
 
-	} //trig_checkpoint()
+	if (checkpoints.empty()) [[unlikely]] {
+		auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(now - start);
+		checkpoints.push_back({make_output(start), ms});
+	} else [[likely]] {
+		auto ms = millis - checkpoints.back().second;
+		checkpoints.push_back({make_output(start), ms});
+	}
+} //trig_checkpoint()
 
