@@ -39,7 +39,8 @@ std::string_view stopwatch::make_output(clock::time_point start) {
 	return sv{hrs + ":" + min + ":" + sec + "." + ms};
 } // stopwatch::make_output()
 
-stopwatch::clock::time_point stopwatch::get_input(std::string_view output) {
+// UNUSED
+/* stopwatch::clock::time_point stopwatch::get_input(std::string_view output) {
 	int hr = 0, min = 0, sec = 0, ms = 0;
 	size_t end_hr = output.find(":"), end_min = output.find(":", end_hr), end_sec = output.find(".", end_min), end_ms = output.size();
 	auto str_hr = output.substr(0, end_hr);
@@ -66,8 +67,7 @@ stopwatch::clock::time_point stopwatch::get_input(std::string_view output) {
 		c -= '0';
 		ms += sc_(int, sc_(u64, c) * power(10, str_ms.length() - i));
 	}
-
-} // get_input()
+} // get_input() */
 
 void stopwatch::trig_checkpoint(checkpoints_t &checkpoints, clock::time_point start) {
 	auto now = clock::now();
@@ -82,4 +82,9 @@ void stopwatch::trig_checkpoint(checkpoints_t &checkpoints, clock::time_point st
 		checkpoints.push_back({make_output(start), ms});
 	}
 } //trig_checkpoint()
+
+void stopwatch::disp_checkpoints(const checkpoints_t &checkpoints){
+
+}
+
 

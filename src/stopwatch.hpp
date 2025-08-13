@@ -34,14 +34,19 @@ namespace stopwatch{
 	/// @return hours:mins:seconds.milliseconds, 2 digits for minutes and seconds, 3 digits for milliseconds
 	std::string_view make_output(clock::time_point start);
 
-	/// @brief Restores std::chrono::steady_clock::time_point from a std::string
+	//UNUSED
+/* 	/// @brief Restores std::chrono::steady_clock::time_point from a std::string
 	/// @param output the string, which holds the time_point (format: "[0-9]+:[0-9]{2}:[0-9]{2}.[0-9]{3}" order: "h min sec ms")
 	/// @return Timepoint
-	clock::time_point get_input(std::string_view output);
+	clock::time_point get_input(std::string_view output); */
 
 	/// @brief adds a checkpoint to the vector
 	/// @param checkpoints the checkpoints object, in which the checkpoint should be added
 	void trig_checkpoint(checkpoints_t &checkpoints, clock::time_point start);
+
+	/// @brief prints the checkpoints to the screen
+	/// @param checkpoints The checkpoints object
+	void disp_checkpoints(const checkpoints_t &checkpoints);
 
 }
 #endif
