@@ -70,12 +70,12 @@ std::string_view stopwatch::make_output(clock::time_point start) {
 } // get_input() */
 
 void stopwatch::trig_checkpoint(checkpoints_t &checkpoints, clock::time_point start) {
+	using namespace std::chrono;
 	auto now = clock::now();
-	auto dur = now.time_since_epoch();
-	auto millis = std::chrono::duration_cast<std::chrono::milliseconds>(dur);
+	auto millis = duration_cast<milliseconds>(now.time_since_epoch());
 
 	if (checkpoints.empty()) [[unlikely]] {
-		auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(now - start);
+		auto ms = duration_cast<milliseconds>(now - start);
 		checkpoints.push_back({make_output(start), ms});
 	} else [[likely]] {
 		auto ms = millis - checkpoints.back().second;
