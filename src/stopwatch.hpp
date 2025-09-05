@@ -10,7 +10,6 @@
 #include <thread>
 #include <vector>
 #include <array>
-#include <tuple>
 #include "power.hpp"
 
 #define sc_(T,x) static_cast<T>(x)
@@ -18,7 +17,7 @@
 /// @brief Holding utility functions and types.
 namespace stopwatch{
 	/// @brief a vector of pairs with a string and a Timepoint
-	typedef std::vector<std::pair<std::string, std::chrono::milliseconds>> checkpoints_t;
+	typedef std::vector<std::pair<std::string, std::chrono::milliseconds>> checkpoints_t; // TODO: pair isnt needed here.
 	using clock = std::chrono::steady_clock;
 
 	/// @brief Initializes ncurses
@@ -44,10 +43,5 @@ namespace stopwatch{
 	/// @param checkpoints the checkpoints object, in which the checkpoint should be added
 	/// @param start Timepoint of begin
 	void trig_checkpoint(checkpoints_t &checkpoints, clock::time_point start);
-
-	/// @brief prints the checkpoints to the screen
-	/// @param checkpoints The checkpoints object
-	void disp_checkpoints(const checkpoints_t &checkpoints);
-
 }
 #endif

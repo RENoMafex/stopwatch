@@ -15,7 +15,6 @@ void stopwatch::delayMicros(u64 µs){
 
 std::string stopwatch::make_output(clock::time_point start) {
 	namespace c = std::chrono;
-	using sv = std::string_view;
 	using str = std::string;
 
 	auto now = clock::now();
@@ -82,9 +81,3 @@ void stopwatch::trig_checkpoint(checkpoints_t &checkpoints, clock::time_point st
 		checkpoints.push_back({make_output(start), ms});
 	}
 } //trig_checkpoint()
-
-void stopwatch::disp_checkpoints(const checkpoints_t &checkpoints){
-
-}
-
-
