@@ -13,7 +13,7 @@ void stopwatch::delayMicros(u64 µs){
 	std::this_thread::sleep_for(std::chrono::microseconds(µs));
 }
 
-std::string_view stopwatch::make_output(clock::time_point start) {
+std::string stopwatch::make_output(clock::time_point start) {
 	namespace c = std::chrono;
 	using sv = std::string_view;
 	using str = std::string;
@@ -36,7 +36,7 @@ std::string_view stopwatch::make_output(clock::time_point start) {
 		min.insert(min.begin(), '0');
 	}
 
-	return sv{hrs + ":" + min + ":" + sec + "." + ms};
+	return str{hrs + ":" + min + ":" + sec + "." + ms};
 } // stopwatch::make_output()
 
 // UNUSED

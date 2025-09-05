@@ -18,7 +18,7 @@
 /// @brief Holding utility functions and types.
 namespace stopwatch{
 	/// @brief a vector of pairs with a string and a Timepoint
-	typedef std::vector<std::pair<std::string_view, std::chrono::milliseconds>> checkpoints_t;
+	typedef std::vector<std::pair<std::string, std::chrono::milliseconds>> checkpoints_t;
 	using clock = std::chrono::steady_clock;
 
 	/// @brief Initializes ncurses
@@ -32,7 +32,7 @@ namespace stopwatch{
 	/// @brief Generates output to display
 	/// @param start Timepoint of begin
 	/// @return hours:mins:seconds.milliseconds, 2 digits for minutes and seconds, 3 digits for milliseconds
-	std::string_view make_output(clock::time_point start);
+	std::string make_output(clock::time_point start);
 
 	//UNUSED
 /* 	/// @brief Restores std::chrono::steady_clock::time_point from a std::string
@@ -42,6 +42,7 @@ namespace stopwatch{
 
 	/// @brief adds a checkpoint to the vector
 	/// @param checkpoints the checkpoints object, in which the checkpoint should be added
+	/// @param start Timepoint of begin
 	void trig_checkpoint(checkpoints_t &checkpoints, clock::time_point start);
 
 	/// @brief prints the checkpoints to the screen

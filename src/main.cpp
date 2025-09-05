@@ -37,7 +37,7 @@ int main(){
 	while (stopflag == false) {
 		move(row, col);
 		print_help();
-		printw("%s", sw::make_output(start).data());
+		printw("%s", sw::make_output(start).c_str());
 		sw::delayMicros(500);
 		refresh();
 
@@ -45,8 +45,10 @@ int main(){
 		s32 key = getch();
 
 		if (key == KEY_SPACE) [[unlikely]] {
-			row++;
 			sw::trig_checkpoint(checkpoints, start);
+			sw::delayMicros(500);
+			printw("%c%s",' ' , checkpoints.size() >= 2 ? checkpoints.at(checkpoints.size() - 2).first.c_str() : "");
+			row++;
 		} else [[likely]] {
 			clearline();
 		}
@@ -56,7 +58,7 @@ int main(){
 		}
 	}
 	endwin();
-	printf("%s%s%c", "Stopwatch stopped at: ", sw::make_output(start).data(), '\n');
+	printf("%s%s%c", "Stopwatch stopped at: ", sw::make_output(start).c_str(), '\n');
 	// std::cout << sw::make_output(start) << std::endl; //<- somehow doesnt work?!
 
 	return 0;
