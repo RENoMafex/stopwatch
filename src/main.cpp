@@ -47,7 +47,8 @@ int main(){
 		if (key == KEY_SPACE) [[unlikely]] {
 			sw::trig_checkpoint(checkpoints, start);
 			sw::delayMicros(500);
-			printw("%c%s",' ' , checkpoints.size() >= 2 ? checkpoints.at(checkpoints.size() - 2).first.c_str() : "");
+			printw("%c%lu",' ' , checkpoints.back());
+			// printw("%c%s",' ' , checkpoints.back().first.c_str());
 			row++;
 		} else [[likely]] {
 			clearline();
