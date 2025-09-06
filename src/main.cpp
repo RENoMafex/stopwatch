@@ -83,7 +83,7 @@ void print_help(){
 		"[SPACEBAR] = Checkpoint"sv,
 		" [RETURN]  = Exit"sv,
 		""sv,
-		"   h:min:sec.ms"sv
+		"      h:min:sec.ms"sv
 	};
 
 	const s32 max_x = getmaxx(stdscr);
