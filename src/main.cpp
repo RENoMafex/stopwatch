@@ -48,7 +48,6 @@ int main(){
 			sw::trig_checkpoint(checkpoints, start);
 			sw::delayMicros(500);
 			printw("%c%lu",' ' , checkpoints.back());
-			// printw("%c%s",' ' , checkpoints.back().first.c_str());
 			row++;
 		} else [[likely]] {
 			clearline();
