@@ -17,7 +17,7 @@
 /// @brief Holding utility functions and types.
 namespace stopwatch{
 	/// @brief a vector of pairs with a string and a Timepoint
-	typedef std::vector<std::pair<std::string, std::chrono::milliseconds>> checkpoints_t; // TODO: pair isnt needed here.
+	typedef std::vector<u64> checkpoints_t;
 	using clock = std::chrono::steady_clock;
 
 	/// @brief Initializes ncurses
