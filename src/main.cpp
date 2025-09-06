@@ -46,15 +46,12 @@ int main(){
 
 		if (key == KEY_SPACE) [[unlikely]] {
 			sw::trig_checkpoint(checkpoints, start);
-			sw::delayMicros(500);
 			printw("%c%lu",' ' , checkpoints.back());
 			row++;
+		} else if (key == KEY_ENTER) [[unlikely]] {
+			stopflag = true;
 		} else [[likely]] {
 			clearline();
-		}
-
-		if (key == KEY_ENTER) [[unlikely]] {
-			stopflag = true;
 		}
 	}
 	endwin();
