@@ -61,7 +61,6 @@ int main(){
 	}
 	endwin();
 	printf("%s%s%c", "Stopwatch stopped at: ", sw::make_output(start).c_str(), '\n');
-	// std::cout << sw::make_output(start) << std::endl; //<- somehow doesnt work?!
 
 	return 0;
 } // main()
