@@ -38,6 +38,43 @@ std::string stopwatch::make_output(clock::time_point start) {
 	return str{hrs + ":" + min + ":" + sec + "." + ms};
 } // stopwatch::make_output()
 
+std::string stopwatch::make_output(const checkpoints_t& checkpoints) {
+	using str = std::string;
+
+	str ms  = std::to_string(checkpoints.back() % 1000);
+	str sec = std::to_string((checkpoints.back() / 1000) % 60);
+	str min = std::to_string((checkpoints.back() / 60000) % 60);
+	str hrs = std::to_string((checkpoints.back() / 3600000));
+
+	while (ms.length() < 3) {
+		ms.insert(ms.begin(), '0');
+	}
+
+	while (sec.length() < 2) {
+		sec.insert(sec.begin(), '0');
+	}
+
+	while (min.length() < 2) {
+		min.insert(min.begin(), '0');
+	}
+
+	return str{hrs + ":" + min + ":" + sec + "." + ms};
+}
+
+void stopwatch::trig_checkpoint(checkpoints_t &checkpoints, clock::time_point start) {
+	using namespace std::chrono;
+	auto now = clock::now();
+	auto ms = static_cast<u64>(duration_cast<milliseconds>(now - start).count());
+
+	if (checkpoints.empty()) [[unlikely]] { //first run only
+		checkpoints.push_back(ms);
+	} else [[likely]] {
+		u64 all = 0;
+		for (auto checkpoint : checkpoints) {all += checkpoint;}
+		checkpoints.push_back(ms - all);
+	}
+} //trig_checkpoint()
+
 // UNUSED
 /* stopwatch::clock::time_point stopwatch::get_input(std::string_view output) {
 	int hr = 0, min = 0, sec = 0, ms = 0;
@@ -67,17 +104,3 @@ std::string stopwatch::make_output(clock::time_point start) {
 		ms += sc_(int, sc_(u64, c) * power(10, str_ms.length() - i));
 	}
 } // get_input() */
-
-void stopwatch::trig_checkpoint(checkpoints_t &checkpoints, clock::time_point start) {
-	using namespace std::chrono;
-	auto now = clock::now();
-	auto ms = static_cast<u64>(duration_cast<milliseconds>(now - start).count());
-
-	if (checkpoints.empty()) [[unlikely]] { //first run only
-		checkpoints.push_back(ms);
-	} else [[likely]] {
-		u64 all = 0;
-		for (auto checkpoint : checkpoints) {all += checkpoint;}
-		checkpoints.push_back(ms - all);
-	}
-} //trig_checkpoint()

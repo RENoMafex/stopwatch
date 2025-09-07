@@ -46,7 +46,7 @@ int main(){
 
 		if (key == KEY_SPACE) [[unlikely]] {
 			sw::trig_checkpoint(checkpoints, start);
-			printw("%c%lu",' ' , checkpoints.back());
+			printw("%c%s",' ' , sw::make_output(checkpoints).c_str());
 			row++;
 		} else if (key == KEY_ENTER) [[unlikely]] {
 			stopflag = true;

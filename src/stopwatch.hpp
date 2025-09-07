@@ -16,7 +16,7 @@
 
 /// @brief Holding utility functions and types.
 namespace stopwatch{
-	/// @brief a vector of pairs with a string and a Timepoint
+	/// @brief a vector of milliseconds since last checkpoint
 	typedef std::vector<u64> checkpoints_t;
 	using clock = std::chrono::steady_clock;
 
