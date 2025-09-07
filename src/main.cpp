@@ -27,12 +27,15 @@ int main(){
 	bool stopflag = false;
 	auto start = sw::init();
 
-	int row = 0;
+	int row = 1;
 	int col = 0;
 
 	sw::checkpoints_t checkpoints = {};
-
 	nodelay(stdscr, true);
+	printw("%s", "Checkpoint: ");
+	attron(A_DIM);
+	printw("%s", "Time since last checkpoint:");
+	attroff(A_DIM);
 
 	while (stopflag == false) {
 		move(row, col);
@@ -46,7 +49,9 @@ int main(){
 
 		if (key == KEY_SPACE) [[unlikely]] {
 			sw::trig_checkpoint(checkpoints, start);
+			attron(A_DIM);
 			printw("%c%s",' ' , sw::make_output(checkpoints).c_str());
+			attroff(A_DIM);
 			row++;
 		} else if (key == KEY_ENTER) [[unlikely]] {
 			stopflag = true;
