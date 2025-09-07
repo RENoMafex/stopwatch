@@ -143,7 +143,7 @@ $(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp $(HDRS) | $(BUILD_DIR)/
 	@$(COMPILER) -c $< -o $@ $(CONST_COMPILER_FLAGS)
 	@echo "$(GREEN)$(UNDERLINE)Done compiling$(R) $(B)$(UNDERLINE)$(notdir $@)$(R)"
 	@$(eval DONEOBJS = $(shell expr $(DONEOBJS) + "1"))
-	@printf "$(B)$(CYAN)Progress: $(B)$(GREEN)%.0f%%$(R)\n" $(shell echo "scale=2; ($(DONEOBJS) * 100) / $(NEEDEDOBJS)" | bc)
+	@printf "$(B)$(CYAN)Progress: $(B)$(BGREEN)%.0f%%$(R)\n" $(shell echo "scale=2; ($(DONEOBJS) * 100) / $(NEEDEDOBJS)" | bc)
 
 # Assemble
 .PHONY: assemble
