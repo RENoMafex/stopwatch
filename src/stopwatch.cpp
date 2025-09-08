@@ -75,32 +75,32 @@ void stopwatch::trig_checkpoint(checkpoints_t &checkpoints, clock::time_point st
 	}
 } //trig_checkpoint()
 
-unsigned int stopwatch::calc_min(stopwatch::checkpoints_t checkpoints) {
+unsigned int stopwatch::calc_min(const checkpoints_t& checkpoints) {
 	u32 min = 0;
 	for (auto checkpoint : checkpoints) {
-		if (checkpoint < min) min = checkpoint;
+		if (checkpoint < min) min = static_cast<u32>(checkpoint);
 	}
 
 	return min;
 }
 
-unsigned int stopwatch::calc_max(stopwatch::checkpoints_t checkpoints) {
+unsigned int stopwatch::calc_max(const checkpoints_t& checkpoints) {
 	u32 max = 0;
 	for (auto checkpoint : checkpoints) {
-		if (checkpoint > max) max = checkpoint;
+		if (checkpoint > max) max = static_cast<u32>(checkpoint);
 	}
 
 	return max;
 }
 
-unsigned int stopwatch::calc_avg(stopwatch::checkpoints_t checkpoints) {
+unsigned int stopwatch::calc_avg(const checkpoints_t& checkpoints) {
 	size_t i = 0;
 	u32 sum = 0;
 	for (auto checkpoint : checkpoints) {
 		i++;
-		sum += checkpoint;
+		sum += static_cast<u32>(checkpoint);
 	}
-	return sum / i;
+	return sum / static_cast<u32>(i);
 }
 
 // UNUSED
