@@ -40,6 +40,12 @@ namespace stopwatch{
 	/// @param start Timepoint of begin
 	void trig_checkpoint(checkpoints_t &checkpoints, clock::time_point start);
 
+	unsigned int calc_min(checkpoints_t checkpoints);
+
+	unsigned int calc_max(checkpoints_t checkpoints);
+
+	unsigned int calc_avg(checkpoints_t checkpoints);
+
 	//UNUSED
 /* 	/// @brief Restores std::chrono::steady_clock::time_point from a std::string
 	/// @param output the string, which holds the time_point (format: "[0-9]+:[0-9]{2}:[0-9]{2}.[0-9]{3}" order: "h min sec ms")

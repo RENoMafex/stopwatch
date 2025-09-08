@@ -75,6 +75,34 @@ void stopwatch::trig_checkpoint(checkpoints_t &checkpoints, clock::time_point st
 	}
 } //trig_checkpoint()
 
+unsigned int stopwatch::calc_min(stopwatch::checkpoints_t checkpoints) {
+	u32 min = 0;
+	for (auto checkpoint : checkpoints) {
+		if (checkpoint < min) min = checkpoint;
+	}
+
+	return min;
+}
+
+unsigned int stopwatch::calc_max(stopwatch::checkpoints_t checkpoints) {
+	u32 max = 0;
+	for (auto checkpoint : checkpoints) {
+		if (checkpoint > max) max = checkpoint;
+	}
+
+	return max;
+}
+
+unsigned int stopwatch::calc_avg(stopwatch::checkpoints_t checkpoints) {
+	size_t i = 0;
+	u32 sum = 0;
+	for (auto checkpoint : checkpoints) {
+		i++;
+		sum += checkpoint;
+	}
+	return sum / i;
+}
+
 // UNUSED
 /* stopwatch::clock::time_point stopwatch::get_input(std::string_view output) {
 	int hr = 0, min = 0, sec = 0, ms = 0;
