@@ -94,12 +94,14 @@ unsigned int stopwatch::calc_max(const checkpoints_t& checkpoints) {
 }
 
 unsigned int stopwatch::calc_avg(const checkpoints_t& checkpoints) {
+	if (checkpoints.empty()) return 0;
 	size_t i = 0;
 	u32 sum = 0;
 	for (auto checkpoint : checkpoints) {
 		i++;
 		sum += static_cast<u32>(checkpoint);
 	}
+	if (i == 0) return 0;
 	return sum / static_cast<u32>(i);
 }
 
