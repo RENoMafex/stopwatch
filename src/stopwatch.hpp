@@ -33,7 +33,7 @@ namespace stopwatch{
 	/// @return hours:mins:seconds.milliseconds, 2 digits for minutes and seconds, 3 digits for milliseconds
 	std::string make_output(clock::time_point start);
 
-	std::string make_output(const checkpoints_t& checkpoints);
+	std::string make_output(u64 checkpoint);
 
 	/// @brief adds a checkpoint to the vector
 	/// @param checkpoints the checkpoints object, in which the checkpoint should be added

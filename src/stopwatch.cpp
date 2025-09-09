@@ -2,10 +2,13 @@
 
 stopwatch::clock::time_point stopwatch::init() {
 	initscr();
+	init_pair(1, COLOR_WHITE, COLOR_BLACK);
+	init_pair(2, COLOR_GREEN, COLOR_BLACK);
 	noecho();
 	cbreak();
 	clear();
 	curs_set(0);
+	scrollok(stdscr, true);
 	return stopwatch::clock::now();
 }
 
@@ -38,13 +41,13 @@ std::string stopwatch::make_output(clock::time_point start) {
 	return str{hrs + ":" + min + ":" + sec + "." + ms};
 } // stopwatch::make_output()
 
-std::string stopwatch::make_output(const checkpoints_t& checkpoints) {
+std::string stopwatch::make_output(u64 checkpoint) {
 	using str = std::string;
 
-	str ms  = std::to_string(checkpoints.back() % 1000);
-	str sec = std::to_string((checkpoints.back() / 1000) % 60);
-	str min = std::to_string((checkpoints.back() / 60000) % 60);
-	str hrs = std::to_string((checkpoints.back() / 3600000));
+	str ms  = std::to_string(checkpoint % 1000);
+	str sec = std::to_string((checkpoint / 1000) % 60);
+	str min = std::to_string((checkpoint / 60000) % 60);
+	str hrs = std::to_string((checkpoint / 3600000));
 
 	while (ms.length() < 3) {
 		ms.insert(ms.begin(), '0');
@@ -76,7 +79,7 @@ void stopwatch::trig_checkpoint(checkpoints_t &checkpoints, clock::time_point st
 } //trig_checkpoint()
 
 unsigned int stopwatch::calc_min(const checkpoints_t& checkpoints) {
-	u32 min = 0;
+	u32 min = UINT32_MAX;
 	for (auto checkpoint : checkpoints) {
 		if (checkpoint < min) min = static_cast<u32>(checkpoint);
 	}

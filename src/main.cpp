@@ -18,6 +18,7 @@
 
 void clearline();
 void print_help();
+void print_minmaxavg(const stopwatch::checkpoints_t& checkpoints);
 
 int main(){
 	using namespace std::string_literals;
@@ -38,11 +39,12 @@ int main(){
 	attroff(A_DIM);
 
 	while (stopflag == false) {
-		move(row, col);
 		print_help();
+		print_minmaxavg(checkpoints);
+		move(row, col);
 		printw("%s", sw::make_output(start).c_str());
-		sw::delayMicros(500);
 		refresh();
+		sw::delayMicros(500);
 
 
 		s32 key = getch();
@@ -50,7 +52,7 @@ int main(){
 		if (key == KEY_SPACE) [[unlikely]] {
 			sw::trig_checkpoint(checkpoints, start);
 			attron(A_DIM);
-			printw("%c%s",' ' , sw::make_output(checkpoints).c_str());
+			printw("%c%s%c",' ' , sw::make_output(checkpoints.back()).c_str(), '\n');
 			attroff(A_DIM);
 			row++;
 		} else if (key == KEY_ENTER) [[unlikely]] {
@@ -61,7 +63,9 @@ int main(){
 	}
 	endwin();
 	printf("%s%s%c", "Stopwatch stopped at: ", sw::make_output(start).c_str(), '\n');
-
+	if (!checkpoints.empty()) {
+		printf("%s%ld%s", "With ", checkpoints.size(), " Checkpoints\n");
+	}
 	return 0;
 } // main()
 
@@ -80,11 +84,12 @@ void print_help(){
 	using sv = std::string_view;
 	using namespace std::string_view_literals;
 	std::vector<sv> lines = {
-		"      How to use:"sv,
+		"      How to use:      "sv,
 		"[SPACEBAR] = Checkpoint"sv,
-		" [RETURN]  = Exit"sv,
-		""sv,
-		"      h:min:sec.ms"sv
+		" [RETURN]  = Exit      "sv,
+		"                       "sv,
+		"      h:min:sec.ms     "sv,
+		"                       "
 	};
 
 	const s32 max_x = getmaxx(stdscr);
@@ -96,10 +101,44 @@ void print_help(){
 	help_size++;
 	move(0, max_x - help_size);
 	attron(A_BOLD);
-	for(auto line : lines){
+	for (auto line : lines){
 		printw("%s", line.data());
 		move(getcury(stdscr) + 1, max_x - help_size);
 	}
 	attroff(A_BOLD);
 	move(old_row, old_col);
 } // void print_help()
+
+void print_minmaxavg(const stopwatch::checkpoints_t& checkpoints){
+	attron(COLOR_PAIR(2));
+	int old_col = getcurx(stdscr);
+	int old_row = getcury(stdscr);
+
+	using str = std::string;
+	using namespace std::string_literals;
+
+	std::vector<str> lines = {
+		"       Checkpoints:  "s +
+			(checkpoints.size() < std::size_t(10) ? "0"s + std::to_string(checkpoints.size()) : std::to_string(checkpoints.size())),
+		"       min: "s + stopwatch::make_output(stopwatch::calc_min(checkpoints)),
+		"       max: "s + stopwatch::make_output(stopwatch::calc_max(checkpoints)),
+		"       avg: "s + stopwatch::make_output(stopwatch::calc_avg(checkpoints))
+	};
+
+	const s32 max_x = getmaxx(stdscr);
+	s32 minmaxavg_size = 0;
+	for (const auto& line : lines) {
+		minmaxavg_size = (sc_(s32,(line.length())) > minmaxavg_size) ? sc_(s32,(line.length())) : minmaxavg_size;
+	}
+
+	minmaxavg_size++;
+	move(6, max_x - minmaxavg_size);
+	attron(COLOR_PAIR(2));
+	for (auto line : lines){
+		printw("%s", line.data());
+		move(getcury(stdscr) + 1, max_x - minmaxavg_size);
+	}
+	attroff(COLOR_PAIR(2));
+
+	move(old_row, old_col);
+} // void print_minmaxavg()
