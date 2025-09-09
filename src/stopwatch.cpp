@@ -79,7 +79,8 @@ void stopwatch::trig_checkpoint(checkpoints_t &checkpoints, clock::time_point st
 } //trig_checkpoint()
 
 unsigned int stopwatch::calc_min(const checkpoints_t& checkpoints) {
-	u32 min = UINT32_MAX;
+	u32 min = UINT32_MAX;//1193:02:47.295
+	// u32 min = 35999999; // 9:59:59.999
 	for (auto checkpoint : checkpoints) {
 		if (checkpoint < min) min = static_cast<u32>(checkpoint);
 	}
