@@ -2,8 +2,6 @@
 
 stopwatch::clock::time_point stopwatch::init() {
 	initscr();
-	init_pair(1, COLOR_WHITE, COLOR_BLACK);
-	init_pair(2, COLOR_GREEN, COLOR_BLACK);
 	noecho();
 	cbreak();
 	clear();
