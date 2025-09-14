@@ -1,4 +1,6 @@
 #include <iostream>
+#include <fstream>
+#include <cstring>
 #include "stopwatch.hpp"
 
 #pragma region redefines
@@ -20,18 +22,31 @@ void clearline();
 void print_help();
 void print_minmaxavg(const stopwatch::checkpoints_t& checkpoints);
 
-int main(){
+int main(int argc, char* argv[]){
 	using namespace std::string_literals;
 	using namespace std::string_view_literals;
 	namespace sw = stopwatch;
 
 	bool stopflag = false;
-	auto start = sw::init();
 
 	int row = 1;
 	int col = 0;
 
 	sw::checkpoints_t checkpoints = {};
+
+	if (argc > 1) {
+		if (!strcmp(argv[1], "-l") && argc >= 3) {
+			std::ofstream logfile(argv[2]);
+		} else if (!strcmp(argv[1], "-l")) {
+			std::cout << "You need to specify a log file name!" << std::endl;
+			std::cout << "Usage of \"-l\":" << std::endl;
+			std::cout << argv[0] << " -l logfilename" << std::endl;
+			return 1;
+		}
+	}
+
+	auto start = sw::init();
+
 	nodelay(stdscr, true);
 	printw("%s", "Checkpoint: ");
 	attron(A_DIM);
