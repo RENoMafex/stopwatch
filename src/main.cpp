@@ -1,7 +1,9 @@
 #include <iostream>
 #include <fstream>
 #include <cstring>
+#include <ctime>
 #include "stopwatch.hpp"
+#include <boost/chrono/chrono.hpp>
 
 #pragma region redefines
 #ifdef KEY_ENTER
@@ -23,8 +25,7 @@ void print_help();
 void print_minmaxavg(const stopwatch::checkpoints_t& checkpoints);
 
 int main(int argc, char* argv[]){
-	using namespace std::string_literals;
-	using namespace std::string_view_literals;
+	using namespace std::literals;
 	namespace sw = stopwatch;
 
 	bool stopflag = false;
@@ -34,12 +35,36 @@ int main(int argc, char* argv[]){
 
 	sw::checkpoints_t checkpoints = {};
 
+	std::ofstream logfile;
+
 	if (argc > 1) {
-		if (!strcmp(argv[1], "-l") && argc >= 3) {
-			std::ofstream logfile(argv[2]);
+		if (!strcmp(argv[1], "-l") && argc == 3) {
+			auto t = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+			std::tm d = *std::localtime(&t);
+
+			logfile.open(argv[2], std::ios::out | std::ios::app);
+			logfile << "\n-\nLogging began at "
+				<< d.tm_year+1900 << '-'
+				<< d.tm_mon << '-'
+				<< d.tm_mday << ' '
+				<< d.tm_hour << ':'
+				<< d.tm_min << ':'
+				<< d.tm_sec << '.'
+				<< sw::make_output(static_cast<u64>(
+					std::chrono::duration_cast<std::chrono::milliseconds>(
+						std::chrono::system_clock::now().time_since_epoch()
+					).count()) % 1000ul
+				).substr(8)
+			<< std::endl;
 		} else if (!strcmp(argv[1], "-l")) {
 			std::cout << "You need to specify a log file name!" << std::endl;
 			std::cout << "Usage of \"-l\":" << std::endl;
+			std::cout << argv[0] << " -l logfilename" << std::endl;
+			return 1;
+		} else {
+			std::cout << "Usage:" << std::endl;
+			std::cout << argv[0] << std::endl;
+			std::cout << "or:" << std::endl;
 			std::cout << argv[0] << " -l logfilename" << std::endl;
 			return 1;
 		}
@@ -71,6 +96,7 @@ int main(int argc, char* argv[]){
 			attroff(A_DIM);
 			row++;
 		} else if (key == KEY_ENTER) [[unlikely]] {
+			sw::trig_checkpoint(checkpoints, start);
 			stopflag = true;
 		} else [[likely]] {
 			clearline();
@@ -81,6 +107,14 @@ int main(int argc, char* argv[]){
 	if (!checkpoints.empty()) {
 		printf("%s%ld%s", "With ", checkpoints.size(), " Checkpoints\n");
 	}
+
+	logfile << "Number of triggered checkpoints: " << checkpoints.size() << std::endl;
+
+	size_t i = 0;
+	for (auto cp : checkpoints) {
+		logfile << ++i << '\t' << ' ' << sw::make_output(cp) << std::endl;
+	}
+
 	return 0;
 } // main()
 
