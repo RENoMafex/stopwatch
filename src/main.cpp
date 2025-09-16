@@ -145,7 +145,7 @@ void print_help(){
 		" [RETURN]  = Exit      "sv,
 		"                       "sv,
 		"      h:min:sec.ms     "sv,
-		"                       "
+		"                       "sv
 	};
 
 	const s32 max_x = getmaxx(stdscr);
