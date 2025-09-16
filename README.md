@@ -1,6 +1,6 @@
 # stopwatch
 Well, this is just a very simple stopwatch for the terminal.
-> [!NOTE]
+> [!IMPORTANT]
 > This branch only works on systems, that support `ncurses.h`.
 > There also is a crossplatform branch, which only utilizes the C++17 STL.
 
