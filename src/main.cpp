@@ -29,6 +29,7 @@ int main(int argc, char* argv[]){
 	namespace sw = stopwatch;
 
 	bool stopflag = false;
+	bool  logflag = false;
 
 	int row = 1;
 	int col = 0;
@@ -39,6 +40,7 @@ int main(int argc, char* argv[]){
 
 	if (argc > 1) {
 		if (!strcmp(argv[1], "-l") && argc == 3) {
+			logflag = true;
 			auto t = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
 			std::tm d = *std::localtime(&t);
 
@@ -53,8 +55,8 @@ int main(int argc, char* argv[]){
 				<< sw::make_output(static_cast<u64>(
 					std::chrono::duration_cast<std::chrono::milliseconds>(
 						std::chrono::system_clock::now().time_since_epoch()
-					).count()) % 1000ul
-				).substr(8)
+					).count()
+				) % 1000).substr(8)
 			<< std::endl;
 		} else if (!strcmp(argv[1], "-l")) {
 			std::cout << "You need to specify a log file name!" << std::endl;
@@ -86,7 +88,6 @@ int main(int argc, char* argv[]){
 		refresh();
 		sw::delayMicros(500);
 
-
 		s32 key = getch();
 
 		if (key == KEY_SPACE) [[unlikely]] {
@@ -104,16 +105,22 @@ int main(int argc, char* argv[]){
 	}
 	endwin();
 	printf("%s%s%c", "Stopwatch stopped at: ", sw::make_output(start).c_str(), '\n');
-	if (!checkpoints.empty()) {
+	if (!checkpoints.empty()) [[likely]] {
 		printf("%s%ld%s", "With ", checkpoints.size(), " Checkpoints\n");
 	}
+	if (logflag) {
+		logfile << "Number of triggered checkpoints: " << checkpoints.size() << std::endl;
 
-	logfile << "Number of triggered checkpoints: " << checkpoints.size() << std::endl;
+		size_t cp_count = 0;
+		for (auto cp : checkpoints) {
+			logfile << ++cp_count << '\t' << ' ' << sw::make_output(cp) << std::endl;
+		}
 
-	size_t i = 0;
-	for (auto cp : checkpoints) {
-		logfile << ++i << '\t' << ' ' << sw::make_output(cp) << std::endl;
+		logfile.close();
+		printf("%s%s%c", "Log saved to ", argv[2], '\n');
 	}
+
+
 
 	return 0;
 } // main()
