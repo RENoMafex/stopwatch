@@ -52,11 +52,9 @@ int main(int argc, char* argv[]){
 				<< d.tm_hour << ':'
 				<< d.tm_min << ':'
 				<< d.tm_sec << '.'
-				<< sw::make_output(static_cast<u64>(
-					std::chrono::duration_cast<std::chrono::milliseconds>(
-						std::chrono::system_clock::now().time_since_epoch()
-					).count()
-				) % 1000).substr(8)
+				<< sw::make_output(sc_(u64, std::chrono::duration_cast<std::chrono::milliseconds>(
+					std::chrono::system_clock::now().time_since_epoch()
+				).count()) % 1000).substr(8)
 			<< std::endl;
 		} else if (!strcmp(argv[1], "-l")) {
 			std::cout << "You need to specify a log file name!" << std::endl;
