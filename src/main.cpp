@@ -32,9 +32,8 @@ int main(int argc, char** argv){
 			return 0;
 
 		default:
-			std::cout << ANSI::bold << "Usage:" << ANSI::reset <<" \"" <<
-			/*         */*argv << "\"\n" << ANSI::bold << "Note: " << ANSI::reset <<
-			/*         */"Only works with terminals, that support ANSI-Sequences\n" << std::endl;
+			std::cout << ANSI::bold << "Usage: " << ANSI::reset <<"\"" << *argv << "\", without any Arguments!\n"
+			/*      */<< ANSI::bold << "Note: " << ANSI::reset << "Only works with terminals, that support ANSI-Sequences\n" << std::endl;
 
 			return 1;
 	}
